@@ -1,148 +1,227 @@
 "use client";
 import { useState } from "react";
-import { Activity, TYPE_COLORS, TYPE_BG, TYPE_LABELS } from "@/lib/activities";
+import { Activity } from "@/lib/activities";
 
 interface Props {
   activity: Activity;
   onNext: () => void;
+  accentColor: string;
 }
 
-export default function ActivityDisplay({ activity, onNext }: Props) {
+export default function ActivityDisplay({ activity, onNext, accentColor }: Props) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [tfAnswer, setTfAnswer] = useState<boolean | null>(null);
-  const [revealed, setRevealed] = useState(false);
-
-  const gradient = TYPE_COLORS[activity.type];
-  const bgClass = TYPE_BG[activity.type];
-  const label = TYPE_LABELS[activity.type];
+  const [tfAnswer, setTfAnswer]             = useState<boolean | null>(null);
+  const [revealed, setRevealed]             = useState(false);
 
   const quizCorrect = selectedAnswer === activity.answer;
-  const tfCorrect =
+  const tfCorrect   =
     tfAnswer !== null &&
-    ((activity.answer === "true" && tfAnswer === true) ||
-      (activity.answer === "false" && tfAnswer === false));
+    ((activity.answer === "true" && tfAnswer) || (activity.answer === "false" && !tfAnswer));
 
   return (
-    <div className={`rounded-3xl border-2 ${bgClass} overflow-hidden shadow-xl animate-pop-in`}>
-      {/* Header band */}
-      <div className={`bg-gradient-to-r ${gradient} px-5 py-3 flex items-center gap-2`}>
-        <span className="text-2xl">{activity.emoji}</span>
-        <span className="text-white font-bold text-sm uppercase tracking-widest">{label}</span>
-      </div>
+    <div
+      className="animate-fade-up"
+      style={{
+        backgroundColor: "#fff",
+        border: "2.5px solid rgba(0,0,0,0.08)",
+        borderRadius: 20,
+        overflow: "hidden",
+        boxShadow: "0 4px 0 rgba(0,0,0,0.1)",
+      }}
+    >
+      {/* Accent stripe */}
+      <div style={{ height: 4, backgroundColor: accentColor }} />
 
-      <div className="p-5 space-y-4">
-        <h2 className="text-xl font-extrabold text-gray-800">{activity.title}</h2>
-        <p className="text-gray-700 leading-relaxed text-base">{activity.content}</p>
+      <div style={{ padding: "28px 24px 24px" }}>
 
-        {/* QUIZ */}
+        {/* Emoji + title */}
+        <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 20 }}>
+          <span style={{ fontSize: 36, lineHeight: 1, flexShrink: 0 }}>{activity.emoji}</span>
+          <h2 style={{
+            fontFamily: "var(--font-display, var(--font-sans, sans-serif))",
+            fontSize: "clamp(20px, 4vw, 26px)",
+            fontWeight: 800,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.2,
+            color: "#111",
+            margin: 0,
+          }}>
+            {activity.title}
+          </h2>
+        </div>
+
+        {/* Body text */}
+        <p style={{
+          fontFamily: "var(--font-sans, sans-serif)",
+          fontSize: "clamp(16px, 2.5vw, 18px)",
+          fontWeight: 400,
+          lineHeight: 1.65,
+          color: "#444",
+          margin: "0 0 28px",
+        }}>
+          {activity.content}
+        </p>
+
+        {/* ── Quiz ──────────────────────────────────────────────────────── */}
         {activity.type === "quiz" && activity.options && (
-          <div className="space-y-2">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
             {activity.options.map((opt) => {
-              let cls = "w-full text-left px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 ";
-              if (!selectedAnswer) {
-                cls += "border-gray-200 bg-white hover:border-emerald-400 hover:bg-emerald-50 active:scale-95";
-              } else if (opt === activity.answer) {
-                cls += "border-emerald-500 bg-emerald-100 text-emerald-800";
-              } else if (opt === selectedAnswer) {
-                cls += "border-red-400 bg-red-100 text-red-700";
-              } else {
-                cls += "border-gray-200 bg-white opacity-50";
+              const isSelected = opt === selectedAnswer;
+              const isCorrect  = opt === activity.answer;
+              let bg      = "#F7F7F7";
+              let border  = "#E8E8E8";
+              let color   = "#222";
+              let opacity = 1;
+              if (selectedAnswer) {
+                if (isCorrect)       { bg = "#E8F7F0"; border = "#2F9E6E"; color = "#1A6B49"; }
+                else if (isSelected) { bg = "#FDEDED"; border = "#E8472A"; color = "#C03020"; }
+                else                 { opacity = 0.35; }
               }
               return (
-                <button key={opt} className={cls} onClick={() => !selectedAnswer && setSelectedAnswer(opt)}>
-                  {opt === activity.answer && selectedAnswer ? "✅ " : opt === selectedAnswer ? "❌ " : ""}
+                <button
+                  key={opt}
+                  onClick={() => !selectedAnswer && setSelectedAnswer(opt)}
+                  style={{
+                    textAlign: "left",
+                    padding: "14px 16px",
+                    borderRadius: 12,
+                    border: `1.5px solid ${border}`,
+                    backgroundColor: bg,
+                    fontFamily: "var(--font-sans, sans-serif)",
+                    fontSize: 15,
+                    fontWeight: 400,
+                    color,
+                    opacity,
+                    cursor: selectedAnswer ? "default" : "pointer",
+                    transition: "all 140ms ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  {selectedAnswer && isCorrect  && <span style={{ color: "#2F9E6E", fontWeight: 700 }}>✓</span>}
+                  {selectedAnswer && isSelected && !isCorrect && <span style={{ color: "#E8472A", fontWeight: 700 }}>✗</span>}
                   {opt}
                 </button>
               );
             })}
             {selectedAnswer && (
-              <p className={`text-sm font-semibold ${quizCorrect ? "text-emerald-700" : "text-red-600"}`}>
-                {quizCorrect ? "🎉 Correct!" : `Answer: ${activity.answer}`}
+              <p style={{ fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, fontWeight: 600, color: quizCorrect ? "#2F9E6E" : "#E8472A", margin: "4px 0 0" }}>
+                {quizCorrect ? "Correct!" : `Answer: ${activity.answer}`}
               </p>
             )}
+            {selectedAnswer && activity.hint && <Hint text={activity.hint} />}
           </div>
         )}
 
-        {/* TRUE / FALSE */}
+        {/* ── True / False ──────────────────────────────────────────────── */}
         {activity.type === "trueFalse" && (
-          <div className="flex gap-3">
-            {[true, false].map((val) => {
-              let cls = "flex-1 py-3 rounded-xl font-bold text-lg border-2 transition-all duration-200 active:scale-95 ";
-              if (tfAnswer === null) {
-                cls += val
-                  ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                  : "border-red-300 bg-red-50 text-red-700 hover:bg-red-100";
-              } else if (tfAnswer === val) {
-                cls += tfCorrect ? "border-emerald-500 bg-emerald-100" : "border-red-500 bg-red-100";
-              } else {
-                cls += "opacity-40 border-gray-200 bg-white";
-              }
-              return (
-                <button key={String(val)} className={cls} onClick={() => tfAnswer === null && setTfAnswer(val)}>
-                  {val ? "✅ True" : "❌ False"}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* T/F result + hint */}
-        {activity.type === "trueFalse" && tfAnswer !== null && (
-          <div className="space-y-2">
-            <p className={`text-sm font-semibold ${tfCorrect ? "text-emerald-700" : "text-red-600"}`}>
-              {tfCorrect ? "🎉 Correct!" : `Answer: ${activity.answer === "true" ? "TRUE" : "FALSE"}`}
-            </p>
-            {activity.hint && (
-              <div className="bg-white/70 border border-gray-200 rounded-xl p-3 text-sm italic text-gray-600">
-                {activity.hint}
-              </div>
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+              {([true, false] as const).map((val) => {
+                const isSelected  = tfAnswer === val;
+                const answered    = tfAnswer !== null;
+                const thisCorrect = (val && activity.answer === "true") || (!val && activity.answer === "false");
+                let bg     = val ? "#E8F7F0" : "#FDEDED";
+                let border = val ? "#2F9E6E" : "#E8472A";
+                let color  = val ? "#1A6B49" : "#C03020";
+                let opacity = 1;
+                if (answered) {
+                  if (!isSelected) { opacity = 0.25; }
+                  else if (!thisCorrect) { bg = "#FDEDED"; border = "#E8472A"; color = "#C03020"; }
+                }
+                return (
+                  <button
+                    key={String(val)}
+                    onClick={() => !answered && setTfAnswer(val)}
+                    style={{
+                      flex: 1, padding: "16px 0", borderRadius: 12,
+                      border: `1.5px solid ${border}`, backgroundColor: bg,
+                      fontFamily: "var(--font-sans, sans-serif)", fontSize: 16, fontWeight: 600,
+                      color, opacity, cursor: answered ? "default" : "pointer",
+                      transition: "all 140ms ease",
+                    }}
+                  >
+                    {val ? "True" : "False"}
+                  </button>
+                );
+              })}
+            </div>
+            {tfAnswer !== null && (
+              <>
+                <p style={{ fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, fontWeight: 600, color: tfCorrect ? "#2F9E6E" : "#E8472A", margin: "0 0 10px" }}>
+                  {tfCorrect ? "Correct!" : `Answer: ${activity.answer === "true" ? "True" : "False"}`}
+                </p>
+                {activity.hint && <Hint text={activity.hint} />}
+              </>
             )}
           </div>
         )}
 
-        {/* Quiz hint after answer */}
-        {activity.type === "quiz" && selectedAnswer && activity.hint && (
-          <div className="bg-white/70 border border-gray-200 rounded-xl p-3 text-sm italic text-gray-600">
-            {activity.hint}
-          </div>
-        )}
-
-        {/* Reveal for riddles */}
+        {/* ── Riddle ────────────────────────────────────────────────────── */}
         {activity.type === "riddle" && (
-          <div>
+          <div style={{ marginBottom: 24 }}>
             {!revealed ? (
               <button
                 onClick={() => setRevealed(true)}
-                className="text-sm font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-800"
+                style={{
+                  fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, fontWeight: 600,
+                  color: accentColor, textDecoration: "underline", textUnderlineOffset: 3,
+                  background: "none", border: "none", cursor: "pointer", padding: 0,
+                }}
               >
-                🔍 Reveal Answer
+                Reveal answer
               </button>
             ) : (
-              <div className="bg-white/70 border border-gray-200 rounded-xl p-3 text-sm text-gray-700 space-y-1">
-                <p className="font-bold text-gray-800">Answer: {activity.answer}</p>
-                {activity.hint && <p className="italic">{activity.hint}</p>}
+              <div
+                className="animate-pop-in"
+                style={{ backgroundColor: "#F7F7F7", borderRadius: 12, padding: "14px 16px", border: "1px solid #E8E8E8" }}
+              >
+                <p style={{ fontFamily: "var(--font-sans, sans-serif)", fontSize: 16, fontWeight: 700, color: "#111", margin: activity.hint ? "0 0 6px" : "0" }}>
+                  {activity.answer}
+                </p>
+                {activity.hint && <p style={{ fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, color: "#888", fontStyle: "italic", margin: 0 }}>{activity.hint}</p>}
               </div>
             )}
           </div>
         )}
 
-        {/* Hint for facts/conversations/games */}
-        {["fact", "conversation", "game"].includes(activity.type) && activity.hint && (
-          <div className="bg-white/70 border border-gray-200 rounded-xl p-3 text-sm italic text-gray-600">
-            💡 {activity.hint}
-          </div>
-        )}
-
-        {/* Next button */}
+        {/* ── Next button ───────────────────────────────────────────────── */}
         <button
           onClick={onNext}
-          className={`w-full py-4 rounded-2xl font-extrabold text-white text-lg transition-all duration-200 shadow-lg
-            bg-gradient-to-r ${gradient}
-            hover:scale-[1.02] active:scale-95`}
+          style={{
+            width: "100%",
+            height: 54,
+            borderRadius: 12,
+            border: "none",
+            backgroundColor: accentColor,
+            fontFamily: "var(--font-sans, sans-serif)",
+            fontSize: 16,
+            fontWeight: 600,
+            color: "#fff",
+            cursor: "pointer",
+            letterSpacing: "-0.01em",
+            transition: "transform 140ms cubic-bezier(0.34,1.56,0.64,1), opacity 140ms ease",
+          }}
+          onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.97)"; e.currentTarget.style.opacity = "0.9"; }}
+          onMouseUp={(e)   => { e.currentTarget.style.transform = "scale(1)";    e.currentTarget.style.opacity = "1"; }}
+          onTouchStart={(e) => { e.currentTarget.style.transform = "scale(0.97)"; e.currentTarget.style.opacity = "0.9"; }}
+          onTouchEnd={(e)  => { e.currentTarget.style.transform = "scale(1)";    e.currentTarget.style.opacity = "1"; }}
         >
-          Next Activity →
+          Next →
         </button>
+
       </div>
+    </div>
+  );
+}
+
+function Hint({ text }: { text: string }) {
+  return (
+    <div style={{ backgroundColor: "#F7F7F7", border: "1px solid #E8E8E8", borderRadius: 10, padding: "12px 14px", marginTop: 8 }}>
+      <p style={{ fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, fontStyle: "italic", color: "#888", margin: 0 }}>
+        {text}
+      </p>
     </div>
   );
 }

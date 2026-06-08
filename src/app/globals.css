@@ -1,20 +1,67 @@
+/* Load fonts directly — must be first */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
+:root {
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Nunito', 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Category colors */
+  --c-talk:   #E8472A;
+  --c-fact:   #2F9E6E;
+  --c-tf:     #1B72C0;
+  --c-quiz:   #D4960A;
+  --c-game:   #7048B6;
+  --c-riddle: #D4447A;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  background: #fff;
+}
+
 body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  background: #fff;
+  color: #111;
+  margin: 0;
+  padding: 0;
   overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pop-in {
-  0% { transform: scale(0.85); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
-.animate-pop-in {
-  animation: pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+.animate-fade-up  { animation: fade-up  240ms cubic-bezier(0,0,0.2,1) both; }
+.animate-pop-in   { animation: pop-in   220ms cubic-bezier(0.34,1.56,0.64,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up, .animate-pop-in { animation: none; opacity: 1; transform: none; }
+}
+
+/* ── Focus ──────────────────────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid #1B72C0; outline-offset: 3px; }
+
+/* ── Responsive header padding ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  header { padding: 36px 20px 28px !important; }
+  #activity-section { padding: 32px 16px 60px !important; }
 }

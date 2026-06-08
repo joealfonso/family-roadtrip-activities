@@ -8,21 +8,24 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      animation: {
-        "bounce-slow": "bounce 2s infinite",
-        "spin-slow": "spin 3s linear infinite",
-        "wiggle": "wiggle 0.5s ease-in-out infinite",
-        "pop-in": "pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+      colors: {
+        bg:           "#1C1A17",
+        surface:      "#2A2720",
+        "surface-alt":"#343028",
+        border:       "#4A4540",
+        sun:          "#F5A623",
+        pine:         "#4CAF7D",
+        sky:          "#5BA4CF",
+        berry:        "#C9606A",
+        "kid-yellow": "#FFD166",
+        "kid-coral":  "#FF8C69",
+        "kid-mint":   "#88DABA",
       },
-      keyframes: {
-        wiggle: {
-          "0%, 100%": { transform: "rotate(-6deg)" },
-          "50%": { transform: "rotate(6deg)" },
-        },
-        "pop-in": {
-          "0%": { transform: "scale(0.5)", opacity: "0" },
-          "100%": { transform: "scale(1)", opacity: "1" },
-        },
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        body:    ["var(--font-body)", "system-ui", "sans-serif"],
+        mono:    ["var(--font-mono)", "monospace"],
+        kid:     ["var(--font-kid)", "system-ui", "sans-serif"],
       },
     },
   },
