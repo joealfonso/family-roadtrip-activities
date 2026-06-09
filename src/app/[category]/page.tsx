@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { activities, Activity, ActivityType } from "@/lib/activities";
 import { SLUG_TO_TYPE, CATEGORY_META, TYPE_TO_SLUG, ALL_TYPES } from "@/lib/categories";
@@ -16,8 +16,8 @@ function pickRandom(type: ActivityType, exclude: string[]): Activity | null {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
-  const { category } = use(params);
+export default function CategoryPage({ params }: { params: { category: string } }) {
+  const { category } = params;
   const router = useRouter();
   const type = SLUG_TO_TYPE[category] as ActivityType | undefined;
 
