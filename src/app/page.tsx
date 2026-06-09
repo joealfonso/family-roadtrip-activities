@@ -166,8 +166,8 @@ export default function Home() {
       }}>
         <HeroBackground />
 
-        {/* Text — left side, z above scene */}
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* Text — left side, z above scene, capped so avatars don't overlap */}
+        <div style={{ position: "relative", zIndex: 2, maxWidth: "55%" }}>
           <h1 style={{
             fontFamily: "var(--font-display, sans-serif)",
             fontSize: "clamp(52px, 9vw, 120px)",
@@ -181,28 +181,28 @@ export default function Home() {
           }}>
             {greeting.word}!
           </h1>
-          <p style={{
-            fontFamily: "var(--font-sans, sans-serif)",
-            fontSize: "clamp(12px, 1.4vw, 16px)",
-            fontWeight: 700,
-            color: "#2E6DA4",
-            margin: "0 0 4px",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-          }}>
-            {greeting.lang}
-          </p>
-          <p style={{
-            fontFamily: "var(--font-mono, monospace)",
-            fontSize: "clamp(11px, 1.2vw, 14px)",
-            fontWeight: 400,
-            color: "#5A90B8",
-            margin: 0,
-            letterSpacing: "0.02em",
-            fontStyle: "italic",
-          }}>
-            /{greeting.phonetic}/
-          </p>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, margin: 0 }}>
+            <span style={{
+              fontFamily: "var(--font-sans, sans-serif)",
+              fontSize: "clamp(12px, 1.4vw, 15px)",
+              fontWeight: 700,
+              color: "#2E6DA4",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+            }}>
+              {greeting.lang}
+            </span>
+            <span style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: "clamp(11px, 1.1vw, 13px)",
+              fontWeight: 400,
+              color: "#5A90B8",
+              fontStyle: "italic",
+              letterSpacing: "0.01em",
+            }}>
+              /{greeting.phonetic}/
+            </span>
+          </div>
         </div>
 
         {/* DiceBear pixel-art characters — right side, sitting on the grass */}
