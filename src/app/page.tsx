@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import type { ActivityType } from "@/lib/activities";
-import { CATEGORY_META } from "@/lib/categories";
+import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
 import { getSettings, AppSettings } from "@/lib/store";
 import SettingsPanel from "@/components/SettingsPanel";
 import TripLogPanel  from "@/components/TripLogPanel";
@@ -185,38 +185,30 @@ const FLAT_ICONS: Record<ActivityType, (color: string) => React.ReactNode> = {
 };
 
 // ── Activity card ─────────────────────────────────────────────────────────────
-function ActivityCard({
-  type, selected, onSelect,
-}: {
-  type: ActivityType;
-  selected: boolean;
-  onSelect: () => void;
-}) {
+function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => void }) {
   const meta = CATEGORY_META[type];
-  const iconColor = selected ? meta.color : "rgba(0,0,0,0.30)";
   return (
     <button
       onClick={onSelect}
-      aria-pressed={selected}
       style={{
         background: "none",
         border: "none",
-        borderLeft: `3px solid ${selected ? meta.color : "transparent"}`,
-        padding: "16px 14px",
-        display: "flex", flexDirection: "column", gap: 8,
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
+        borderRight: "1px solid rgba(0,0,0,0.06)",
+        padding: "20px 16px",
+        display: "flex", flexDirection: "column", gap: 10,
         textAlign: "left", cursor: "pointer", width: "100%",
-        transition: "border-color 160ms ease",
+        WebkitTapHighlightColor: "transparent",
       }}
     >
-      {FLAT_ICONS[type](iconColor)}
+      {FLAT_ICONS[type](meta.color)}
       <div>
         <p style={{
           fontFamily: "var(--font-display)",
           fontSize: 15, fontWeight: 700,
-          color: selected ? meta.color : "#1A1A1A",
+          color: "#1A1A1A",
           margin: 0, lineHeight: 1.2,
           letterSpacing: "-0.01em",
-          transition: "color 160ms ease",
         }}>
           {meta.label}
         </p>
@@ -292,7 +284,23 @@ return (
       {/* ── Word of the Day ──────────────────────────────────────────── */}
       <WordCard greeting={greeting} />
 
-      <div style={{ height: 48 }} />
+      {/* ── Activity grid ────────────────────────────────────────────── */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 0,
+        borderTop: "1px solid rgba(0,0,0,0.06)",
+      }}>
+        {ALL_TYPES.map((type) => (
+          <ActivityCard
+            key={type}
+            type={type}
+            onSelect={() => router.push(`/${TYPE_TO_SLUG[type]}`)}
+          />
+        ))}
+      </div>
+
+      <div style={{ height: 32 }} />
 
       {/* ── Overlays ─────────────────────────────────────────────────── */}
       {showSettings && (
