@@ -152,43 +152,64 @@ export default function CategoryPage({ params }: { params: { category: string } 
           position: "fixed", bottom: 0, left: 0, right: 0,
           backgroundColor: "#fff",
           borderTop: "1px solid #E8E8E8",
-          zIndex: 20, height: 68,
+          zIndex: 20, height: 72,
           display: "flex", alignItems: "center",
-          padding: "0 16px", gap: 10,
+          padding: "0 12px", gap: 8,
         }}>
           {/* Tic Tac Toe — active */}
           <div style={{
-            flex: 1, height: 48,
+            flex: 1, height: 52,
             background: `${meta.color}18`,
             border: `2px solid ${meta.color}50`,
             borderRadius: 12,
-            display: "flex", alignItems: "center", gap: 10, padding: "0 14px",
+            display: "flex", alignItems: "center", gap: 8, padding: "0 10px",
           }}>
-            <span style={{ fontSize: 18 }}>🎮</span>
+            <span style={{ fontSize: 16 }}>🎮</span>
             <div>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: meta.color, margin: 0 }}>Tic Tac Toe</p>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "#bbb", margin: 0 }}>Playing now</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: meta.color, margin: 0, whiteSpace: "nowrap" }}>Tic Tac Toe</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 9, color: "#bbb", margin: 0 }}>Playing now</p>
             </div>
           </div>
 
-          {/* Color Spinner — tap to switch */}
+          {/* Color Spinner */}
           <button
             onClick={() => router.push("/spinner")}
             style={{
-              flex: 1, height: 48,
+              flex: 1, height: 52,
               background: "rgba(0,0,0,0.03)",
               border: "2px solid rgba(0,0,0,0.07)",
               borderRadius: 12, cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 10, padding: "0 14px",
+              display: "flex", alignItems: "center", gap: 8, padding: "0 10px",
               transition: "background 140ms ease, border-color 140ms ease",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(217,119,6,0.08)"; e.currentTarget.style.borderColor = "rgba(217,119,6,0.35)"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(217,119,6,0.09)"; e.currentTarget.style.borderColor = "rgba(217,119,6,0.35)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.03)";      e.currentTarget.style.borderColor = "rgba(0,0,0,0.07)"; }}
           >
-            <span style={{ fontSize: 18 }}>🎨</span>
+            <span style={{ fontSize: 16 }}>🎨</span>
             <div style={{ textAlign: "left" }}>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: "#D97706", margin: 0 }}>Color Spinner</p>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "#bbb", margin: 0 }}>Tap to play →</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: "#D97706", margin: 0, whiteSpace: "nowrap" }}>Color Spinner</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 9, color: "#bbb", margin: 0 }}>Tap to play →</p>
+            </div>
+          </button>
+
+          {/* Dragon Flight */}
+          <button
+            onClick={() => router.push("/dragon")}
+            style={{
+              flex: 1, height: 52,
+              background: "rgba(0,0,0,0.03)",
+              border: "2px solid rgba(0,0,0,0.07)",
+              borderRadius: 12, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 8, padding: "0 10px",
+              transition: "background 140ms ease, border-color 140ms ease",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(39,174,96,0.09)"; e.currentTarget.style.borderColor = "rgba(39,174,96,0.35)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.03)";      e.currentTarget.style.borderColor = "rgba(0,0,0,0.07)"; }}
+          >
+            <span style={{ fontSize: 16 }}>🐉</span>
+            <div style={{ textAlign: "left" }}>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 11, fontWeight: 700, color: "#27AE60", margin: 0, whiteSpace: "nowrap" }}>Dragon Flight</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 9, color: "#bbb", margin: 0 }}>Tap to play →</p>
             </div>
           </button>
         </nav>
