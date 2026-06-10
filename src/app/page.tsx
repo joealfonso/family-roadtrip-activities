@@ -74,6 +74,7 @@ function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
         <button
           onClick={() => sayWord(greeting.word, greeting.lang)}
           aria-label={`Pronounce ${greeting.word}`}
+          className="say-btn"
           style={{
             background: "rgba(255,255,255,0.14)",
             border: "1px solid rgba(255,255,255,0.22)",
@@ -190,6 +191,7 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
   return (
     <button
       onClick={onSelect}
+      className="activity-card"
       style={{
         background: "none",
         border: "none",
@@ -275,9 +277,9 @@ return (
 
         <div style={{ display: "flex", gap: 6 }}>
           <button onClick={() => setShowLog(true)} aria-label="Trip log"
-            style={iconBtnStyle}>📓</button>
+            className="icon-btn" style={iconBtnStyle}>📓</button>
           <button onClick={() => setShowSettings(true)} aria-label="Settings"
-            style={iconBtnStyle}>⚙️</button>
+            className="icon-btn" style={iconBtnStyle}>⚙️</button>
         </div>
       </header>
 
