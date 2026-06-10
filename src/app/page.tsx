@@ -131,7 +131,7 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
       <div style={{ textAlign: "center" }}>
         <p suppressHydrationWarning style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(72px, 18vw, 120px)",
+          fontSize: "clamp(56px, 14vw, 88px)",
           fontWeight: 900,
           color: "#fff",
           margin: 0, lineHeight: 1,
@@ -142,9 +142,9 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
         </p>
         <p suppressHydrationWarning style={{
           fontFamily: "var(--font-sans)",
-          fontSize: 17, fontStyle: "italic",
+          fontSize: 14, fontStyle: "italic",
           color: "rgba(255,255,255,0.58)",
-          margin: "14px 0 0", letterSpacing: "0.02em",
+          margin: "10px 0 0", letterSpacing: "0.02em",
         }}>
           / {greeting.phonetic} /
         </p>
