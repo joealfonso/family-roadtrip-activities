@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { AppSettings, saveSettings, setArrivalTime, getArrivalTime } from "@/lib/store";
+import { AppSettings, saveSettings } from "@/lib/store";
 
 interface Props {
   settings:  AppSettings;
@@ -43,13 +42,6 @@ function Toggle({ on, onChange, label, sub }: {
 }
 
 export default function SettingsPanel({ settings, onUpdate, onClose, onOpenLog }: Props) {
-  const existing = getArrivalTime();
-  const [timeVal, setTimeVal] = useState<string>(() => {
-    if (!existing) return "";
-    const d = new Date(existing);
-    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  });
-
   const set = (patch: Partial<AppSettings>) => {
     const next = saveSettings(patch);
     onUpdate(next);
@@ -98,49 +90,6 @@ export default function SettingsPanel({ settings, onUpdate, onClose, onOpenLog }
           label="🏔 Banff mode"
           sub="Only show Banff-specific activities"
         />
-
-        {/* GPS countdown */}
-        <Toggle
-          on={settings.gpsMode}
-          onChange={v => {
-            set({ gpsMode: v });
-            if (!v) setArrivalTime(null); // clear GPS-set ETA when disabled
-          }}
-          label="📍 Use my location"
-          sub="Live countdown based on where you are right now"
-        />
-
-        {/* Manual time fallback — shown only when GPS is off */}
-        {!settings.gpsMode && (
-          <div style={{ padding: "16px 0", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-            <p style={{ fontFamily: "var(--font-sans,sans-serif)", fontSize: 14, fontWeight: 600, color: "#555", margin: "0 0 4px" }}>
-              ⏱ Or set arrival time manually
-            </p>
-            <p style={{ fontFamily: "var(--font-sans,sans-serif)", fontSize: 12, color: "#bbb", margin: "0 0 12px" }}>
-              Backup for when GPS isn't available
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input
-                type="time"
-                value={timeVal}
-                onChange={e => handleTimeChange(e.target.value)}
-                style={{
-                  fontFamily: "var(--font-mono,monospace)", fontSize: 18, fontWeight: 600,
-                  color: "#1A1A1A", border: "2px solid #E0E0E0", borderRadius: 10,
-                  padding: "10px 14px", background: "#F8F8F8", outline: "none", cursor: "pointer",
-                }}
-              />
-              {timeVal && (
-                <button
-                  onClick={() => { setTimeVal(""); setArrivalTime(null); }}
-                  style={{ fontFamily: "var(--font-sans,sans-serif)", fontSize: 12, color: "#bbb", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Trip log */}
         <button
