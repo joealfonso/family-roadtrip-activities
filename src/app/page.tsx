@@ -4,10 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ActivityType } from "@/lib/activities";
 import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
-import { getSettings, getArrivalTime, AppSettings } from "@/lib/store";
-import CountdownBanner from "@/components/CountdownBanner";
-import SettingsPanel   from "@/components/SettingsPanel";
-import TripLogPanel    from "@/components/TripLogPanel";
+import { getSettings, AppSettings } from "@/lib/store";
+import SettingsPanel from "@/components/SettingsPanel";
+import TripLogPanel  from "@/components/TripLogPanel";
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const PINE      = "#1C4B3A";
@@ -239,20 +238,15 @@ export default function Home() {
   const router = useRouter();
   const [greeting,      setGreeting]      = useState(GREETINGS[0]);
   const [settings,      setSettings]      = useState<AppSettings>({ soundEnabled: true, banffMode: false, gpsMode: false });
-  const [arrivalISO,    setArrivalISO]    = useState<string | null>(null);
   const [showSettings,  setShowSettings]  = useState(false);
   const [showLog,       setShowLog]       = useState(false);
 
   useEffect(() => {
     setGreeting(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
     setSettings(getSettings());
-    setArrivalISO(getArrivalTime());
   }, []);
 
-  const handleSettingsUpdate = (s: AppSettings) => {
-    setSettings(s);
-    setArrivalISO(getArrivalTime());
-  };
+  const handleSettingsUpdate = (s: AppSettings) => setSettings(s);
 
 return (
     <div style={{ minHeight: "100vh", backgroundColor: PARCHMENT, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
@@ -294,13 +288,6 @@ return (
             style={iconBtnStyle}>⚙️</button>
         </div>
       </header>
-
-      {/* ── Countdown ────────────────────────────────────────────────── */}
-      <CountdownBanner
-        arrivalISO={arrivalISO}
-        soundEnabled={settings.soundEnabled}
-        gpsMode={settings.gpsMode}
-      />
 
       {/* ── Word of the Day ──────────────────────────────────────────── */}
       <WordCard greeting={greeting} />
