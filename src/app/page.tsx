@@ -58,6 +58,7 @@ const GREETINGS = [
   { word: "Aloha",        lang: "Hawaiian",    phonetic: "ah-LOH-hah"           },
   { word: "Osiyo",        lang: "Cherokee",    phonetic: "oh-SEE-yoh"           },
   { word: "Oki",          lang: "Blackfoot",   phonetic: "OH-kee"               },
+  { word: "Adler",        lang: "🦅",          phonetic: "ADD-ler"              },
 ];
 
 function sayWord(word: string, lang: string) {
@@ -77,13 +78,12 @@ function sayWord(word: string, lang: string) {
 // ── Mountain hero card ────────────────────────────────────────────────────────
 function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; onCycle: () => void }) {
   return (
-    <div style={{
+    <div className="hero-card" style={{
       position: "relative",
       overflow: "hidden",
       borderRadius: 0,
       background: `linear-gradient(175deg, ${GLACIER} 0%, ${PINE} 55%, ${PINE_DARK} 100%)`,
       margin: 0,
-      padding: "28px 24px 88px",
     }}>
       {/* Top row: language badge + Say it */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
@@ -236,7 +236,6 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
         border: "none",
         borderBottom: "1px solid rgba(0,0,0,0.06)",
         borderRight: "1px solid rgba(0,0,0,0.06)",
-        padding: "20px 16px",
         display: "flex", flexDirection: "column", gap: 10,
         textAlign: "left", cursor: "pointer", width: "100%",
         WebkitTapHighlightColor: "transparent",
@@ -330,9 +329,8 @@ return (
       <WordCard greeting={greeting} onCycle={cycleGreeting} />
 
       {/* ── Activity grid ────────────────────────────────────────────── */}
-      <div style={{
+      <div className="activity-grid" style={{
         display: "grid",
-        gridTemplateColumns: "1fr 1fr",
         gap: 0,
         borderTop: "1px solid rgba(0,0,0,0.06)",
       }}>

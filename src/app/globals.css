@@ -74,6 +74,41 @@ body {
   }
 }
 
+/* ── Responsive layout ──────────────────────────────────────────────────── */
+.hero-card {
+  padding: 28px 24px 88px;
+}
+
+.activity-card {
+  padding: 20px 16px;
+}
+
+.activity-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (min-width: 640px) {
+  .hero-card {
+    padding: 48px 40px 120px;
+  }
+  .activity-card {
+    padding: 28px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-card {
+    padding: 72px 56px 160px;
+  }
+  .activity-card {
+    padding: 40px 32px;
+    gap: 16px;
+  }
+  .activity-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
 /* ── Focus ──────────────────────────────────────────────────────────────── */
 :focus-visible { outline: 2px solid var(--pine); outline-offset: 3px; }
 
