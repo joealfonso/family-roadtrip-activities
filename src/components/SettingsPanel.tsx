@@ -47,17 +47,7 @@ export default function SettingsPanel({ settings, onUpdate, onClose, onOpenLog }
     onUpdate(next);
   };
 
-  const handleTimeChange = (val: string) => {
-    setTimeVal(val);
-    if (!val) { setArrivalTime(null); return; }
-    const [h, m] = val.split(":").map(Number);
-    const d = new Date();
-    d.setHours(h, m, 0, 0);
-    if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
-    setArrivalTime(d.toISOString());
-  };
-
-  return (
+return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "flex-end" }}>
       <div
         onClick={e => e.stopPropagation()}
