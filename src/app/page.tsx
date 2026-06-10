@@ -16,20 +16,48 @@ const PARCHMENT = "#F6F1EA";
 
 // ── Greetings ─────────────────────────────────────────────────────────────────
 const GREETINGS = [
-  { word: "Hello",     lang: "English",    phonetic: "heh-LOH"           },
-  { word: "Bonjour",   lang: "French",     phonetic: "bon-ZHOOR"         },
-  { word: "Hola",      lang: "Spanish",    phonetic: "OH-lah"            },
-  { word: "Ciao",      lang: "Italian",    phonetic: "CHOW"              },
-  { word: "Hei",       lang: "Norwegian",  phonetic: "hay"               },
-  { word: "Merhaba",   lang: "Turkish",    phonetic: "mehr-HAH-bah"      },
-  { word: "Olá",       lang: "Portuguese", phonetic: "oh-LAH"            },
-  { word: "Namaste",   lang: "Hindi",      phonetic: "nah-mah-STAY"      },
-  { word: "Salut",     lang: "Romanian",   phonetic: "sah-LOOT"          },
-  { word: "Hallo",     lang: "German",     phonetic: "HAH-loh"           },
-  { word: "Ahoj",      lang: "Czech",      phonetic: "ah-HOY"            },
-  { word: "Sawubona",  lang: "Zulu",       phonetic: "sah-woo-BOH-nah"   },
-  { word: "Nǐ hǎo",    lang: "Mandarin",   phonetic: "nee HOW"           },
-  { word: "Halló",     lang: "Icelandic",  phonetic: "HAH-loh"           },
+  { word: "Hello",        lang: "English",     phonetic: "heh-LOH"              },
+  { word: "Bonjour",      lang: "French",      phonetic: "bon-ZHOOR"            },
+  { word: "Hola",         lang: "Spanish",     phonetic: "OH-lah"               },
+  { word: "Ciao",         lang: "Italian",     phonetic: "CHOW"                 },
+  { word: "Hei",          lang: "Norwegian",   phonetic: "hay"                  },
+  { word: "Merhaba",      lang: "Turkish",     phonetic: "mehr-HAH-bah"         },
+  { word: "Olá",          lang: "Portuguese",  phonetic: "oh-LAH"               },
+  { word: "Namaste",      lang: "Hindi",       phonetic: "nah-mah-STAY"         },
+  { word: "Salut",        lang: "Romanian",    phonetic: "sah-LOOT"             },
+  { word: "Hallo",        lang: "German",      phonetic: "HAH-loh"              },
+  { word: "Ahoj",         lang: "Czech",       phonetic: "ah-HOY"               },
+  { word: "Sawubona",     lang: "Zulu",        phonetic: "sah-woo-BOH-nah"      },
+  { word: "Nǐ hǎo",       lang: "Mandarin",    phonetic: "nee HOW"              },
+  { word: "Halló",        lang: "Icelandic",   phonetic: "HAH-loh"              },
+  { word: "Konnichiwa",   lang: "Japanese",    phonetic: "kon-ee-CHEE-wah"      },
+  { word: "Annyeong",     lang: "Korean",      phonetic: "ahn-NYUNG"            },
+  { word: "Привет",       lang: "Russian",     phonetic: "pree-VYET"            },
+  { word: "Marhaba",      lang: "Arabic",      phonetic: "mar-HAH-bah"          },
+  { word: "Shalom",       lang: "Hebrew",      phonetic: "shah-LOME"            },
+  { word: "Yassas",       lang: "Greek",       phonetic: "YAH-sahs"             },
+  { word: "Hej",          lang: "Swedish",     phonetic: "hay"                  },
+  { word: "Hei",          lang: "Finnish",     phonetic: "hay"                  },
+  { word: "Dag",          lang: "Dutch",       phonetic: "dahk"                 },
+  { word: "Zdravo",       lang: "Croatian",    phonetic: "ZDRAH-voh"            },
+  { word: "Cześć",        lang: "Polish",      phonetic: "cheshch"              },
+  { word: "Szia",         lang: "Hungarian",   phonetic: "see-YAH"              },
+  { word: "Tere",         lang: "Estonian",    phonetic: "TEH-reh"              },
+  { word: "Labas",        lang: "Lithuanian",  phonetic: "LAH-bahs"             },
+  { word: "Kumusta",      lang: "Filipino",    phonetic: "koo-MOO-stah"         },
+  { word: "Sawasdee",     lang: "Thai",        phonetic: "sah-WAHT-dee"         },
+  { word: "Xin chào",     lang: "Vietnamese",  phonetic: "sin CHOW"             },
+  { word: "Halo",         lang: "Indonesian",  phonetic: "HAH-loh"              },
+  { word: "Jambo",        lang: "Swahili",     phonetic: "JAHM-boh"             },
+  { word: "Mbote",        lang: "Lingala",     phonetic: "mm-BOH-teh"           },
+  { word: "Sannu",        lang: "Hausa",       phonetic: "SAH-noo"              },
+  { word: "Salam",        lang: "Persian",     phonetic: "sah-LAHM"             },
+  { word: "Barev",        lang: "Armenian",    phonetic: "bah-REV"              },
+  { word: "Gamarjoba",    lang: "Georgian",    phonetic: "gah-mar-JOH-bah"      },
+  { word: "Sain baina uu",lang: "Mongolian",   phonetic: "sain BAI-nah oo"      },
+  { word: "Aloha",        lang: "Hawaiian",    phonetic: "ah-LOH-hah"           },
+  { word: "Osiyo",        lang: "Cherokee",    phonetic: "oh-SEE-yoh"           },
+  { word: "Oki",          lang: "Blackfoot",   phonetic: "OH-kee"               },
 ];
 
 function sayWord(word: string, lang: string) {
@@ -47,7 +75,7 @@ function sayWord(word: string, lang: string) {
 }
 
 // ── Mountain hero card ────────────────────────────────────────────────────────
-function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
+function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; onCycle: () => void }) {
   return (
     <div style={{
       position: "relative",
@@ -59,17 +87,26 @@ function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
     }}>
       {/* Top row: language badge + Say it */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <span suppressHydrationWarning style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "rgba(255,255,255,0.7)",
-          background: "rgba(255,255,255,0.12)",
-          border: "1px solid rgba(255,255,255,0.18)",
-          borderRadius: 20, padding: "4px 12px",
-        }}>
-          {greeting.lang}
-        </span>
+        <button
+          onClick={onCycle}
+          suppressHydrationWarning
+          aria-label="Next language"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.7)",
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            borderRadius: 20, padding: "4px 12px",
+            cursor: "pointer",
+            transition: "background 140ms ease",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.22)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}
+        >
+          {greeting.lang} ↻
+        </button>
 
         <button
           onClick={() => sayWord(greeting.word, greeting.lang)}
@@ -233,15 +270,18 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const router = useRouter();
-  const [greeting,      setGreeting]      = useState(GREETINGS[0]);
+  const [greetingIdx,   setGreetingIdx]   = useState(0);
   const [settings,      setSettings]      = useState<AppSettings>({ soundEnabled: true, banffMode: false, gpsMode: false });
   const [showSettings,  setShowSettings]  = useState(false);
   const [showLog,       setShowLog]       = useState(false);
 
   useEffect(() => {
-    setGreeting(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
+    setGreetingIdx(Math.floor(Math.random() * GREETINGS.length));
     setSettings(getSettings());
   }, []);
+
+  const greeting = GREETINGS[greetingIdx];
+  const cycleGreeting = () => setGreetingIdx((i) => (i + 1) % GREETINGS.length);
 
   const handleSettingsUpdate = (s: AppSettings) => setSettings(s);
 
@@ -287,7 +327,7 @@ return (
       </header>
 
       {/* ── Word of the Day ──────────────────────────────────────────── */}
-      <WordCard greeting={greeting} />
+      <WordCard greeting={greeting} onCycle={cycleGreeting} />
 
       {/* ── Activity grid ────────────────────────────────────────────── */}
       <div style={{
