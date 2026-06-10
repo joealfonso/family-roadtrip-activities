@@ -24,8 +24,15 @@ function fmtMins(mins: number): string {
 }
 
 export default function CountdownBanner({ arrivalISO, soundEnabled, gpsMode }: Props) {
-  // GPS state owned internally — no prop-passing risk
-  const gps = useLocationETA(gpsMode);
+  const rawGps = useLocationETA(gpsMode);
+
+  // Flatten to safe primitives — never access rawGps.anything inline
+  const gpsActive     = rawGps?.active     ?? false;
+  const gpsLoading    = rawGps?.loading    ?? false;
+  const gpsError      = rawGps?.error      ?? null;
+  const gpsDistanceKm = rawGps?.distanceKm ?? null;
+  const gpsEtaMins    = rawGps?.etaMins    ?? null;
+  const gpsArrived    = rawGps?.arrived    ?? false;
 
   const [manualLabel, setManualLabel] = useState<string | null>(null);
   const [manualKind,  setManualKind]  = useState<"arrived" | "close" | "normal">("normal");
@@ -33,7 +40,7 @@ export default function CountdownBanner({ arrivalISO, soundEnabled, gpsMode }: P
 
   // Manual-time countdown (only when GPS is off and a time is set)
   useEffect(() => {
-    if (gps.active || !arrivalISO) {
+    if (gpsActive || !arrivalISO) {
       setManualLabel(null);
       return;
     }
@@ -44,10 +51,10 @@ export default function CountdownBanner({ arrivalISO, soundEnabled, gpsMode }: P
     tick();
     const id = setInterval(tick, 30_000);
     return () => clearInterval(id);
-  }, [arrivalISO, gps.active]);
+  }, [arrivalISO, gpsActive]);
 
   // Fanfare on arrival
-  const arrived = gps.active ? gps.arrived : manualKind === "arrived";
+  const arrived = gpsActive ? gpsArrived : manualKind === "arrived";
   useEffect(() => {
     if (arrived && !firedFanfare.current && soundEnabled) {
       playFanfare();
@@ -57,7 +64,7 @@ export default function CountdownBanner({ arrivalISO, soundEnabled, gpsMode }: P
   }, [arrived, soundEnabled]);
 
   // ── GPS states ──────────────────────────────────────────────────────────────
-  if (gps.active && gps.loading) {
+  if (gpsActive && gpsLoading) {
     return (
       <div style={bannerStyle("#555")}>
         <span>📍</span>
@@ -66,34 +73,34 @@ export default function CountdownBanner({ arrivalISO, soundEnabled, gpsMode }: P
     );
   }
 
-  if (gps.active && gps.error) {
+  if (gpsActive && gpsError) {
     return (
       <div style={bannerStyle("#B04040")}>
         <span>⚠️</span>
-        <span>{gps.error}</span>
+        <span>{gpsError}</span>
       </div>
     );
   }
 
-  if (gps.active && gps.distanceKm !== null) {
-    const close = !gps.arrived && (gps.etaMins ?? 99) < 30;
-    const bg = gps.arrived ? "#2F9E6E" : close ? "#C98A00" : "#1A1A1A";
+  if (gpsActive && gpsDistanceKm !== null) {
+    const close = !gpsArrived && (gpsEtaMins ?? 99) < 30;
+    const bg = gpsArrived ? "#2F9E6E" : close ? "#C98A00" : "#1A1A1A";
     return (
       <div style={bannerStyle(bg)}>
-        <span style={{ fontSize: 18 }}>{gps.arrived ? "🎉" : "📍"}</span>
+        <span style={{ fontSize: 18 }}>{gpsArrived ? "🎉" : "📍"}</span>
         <span>
-          {gps.arrived
+          {gpsArrived
             ? "You made it to Banff! Welcome to the mountains."
             : close
-            ? `${fmtDist(gps.distanceKm)} away · Almost there — ${fmtMins(gps.etaMins!)} to go!`
-            : `${fmtDist(gps.distanceKm)} to Banff · ~${fmtMins(gps.etaMins!)}`}
+            ? `${fmtDist(gpsDistanceKm)} away · Almost there — ${fmtMins(gpsEtaMins!)} to go!`
+            : `${fmtDist(gpsDistanceKm)} to Banff · ~${fmtMins(gpsEtaMins!)}`}
         </span>
       </div>
     );
   }
 
   // ── Manual countdown fallback ───────────────────────────────────────────────
-  if (!gps.active && manualLabel) {
+  if (!gpsActive && manualLabel) {
     const close = manualKind === "close";
     const bg = manualKind === "arrived" ? "#2F9E6E" : close ? "#C98A00" : "#1A1A1A";
     return (
