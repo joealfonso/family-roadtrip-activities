@@ -1,38 +1,47 @@
-/* Load fonts directly — must be first */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+/* ── Fonts ───────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens ───────────────────────────────────────────────────────── */
 :root {
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-display: 'Nunito', 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --font-sans:    'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono:    ui-monospace, 'SFMono-Regular', monospace;
 
-  /* Category colors */
+  --pine:       #1C4B3A;
+  --pine-dark:  #132E23;
+  --glacier:    #4A8FA8;
+  --amber:      #C98A00;
+  --parchment:  #F6F1EA;
+  --ink:        #1A1A1A;
+
+  /* Category accent colors */
   --c-talk:   #E8472A;
   --c-fact:   #2F9E6E;
   --c-tf:     #1B72C0;
-  --c-quiz:   #D4960A;
+  --c-quiz:   #C98A00;
   --c-game:   #7048B6;
-  --c-riddle: #D4447A;
+  --c-riddle: #C93475;
 }
 
+/* ── Reset ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 
 html {
-  background: #fff;
+  background: var(--parchment);
 }
 
 body {
   font-family: var(--font-sans);
   font-size: 16px;
-  background: #fff;
-  color: #111;
+  background: var(--parchment);
+  color: var(--ink);
   margin: 0;
   padding: 0;
   overscroll-behavior: none;
@@ -50,18 +59,20 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .animate-fade-up  { animation: fade-up  240ms cubic-bezier(0,0,0.2,1) both; }
 .animate-pop-in   { animation: pop-in   220ms cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-slide-up { animation: slide-up 260ms cubic-bezier(0.16,1,0.3,1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up, .animate-pop-in { animation: none; opacity: 1; transform: none; }
+  .animate-fade-up, .animate-pop-in, .animate-slide-up {
+    animation: none; opacity: 1; transform: none;
+  }
 }
 
 /* ── Focus ──────────────────────────────────────────────────────────────── */
-:focus-visible { outline: 2px solid #1B72C0; outline-offset: 3px; }
-
-/* ── Responsive header padding ─────────────────────────────────────────── */
-@media (max-width: 640px) {
-  header { padding: 36px 20px 28px !important; }
-  #activity-section { padding: 32px 16px 60px !important; }
-}
+:focus-visible { outline: 2px solid var(--pine); outline-offset: 3px; }

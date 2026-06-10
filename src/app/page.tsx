@@ -4,347 +4,364 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ActivityType } from "@/lib/activities";
 import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
-import {
-  IllustrationTalk, IllustrationFact, IllustrationTrueFalse,
-  IllustrationQuiz, IllustrationGame, IllustrationRiddle,
-} from "@/components/CategoryIcons";
+import { getSettings, getArrivalTime, AppSettings } from "@/lib/store";
+import CountdownBanner from "@/components/CountdownBanner";
+import SettingsPanel   from "@/components/SettingsPanel";
+import TripLogPanel    from "@/components/TripLogPanel";
 
-const ILLUSTRATIONS: Record<ActivityType, () => JSX.Element> = {
-  conversation: IllustrationTalk,
-  fact:         IllustrationFact,
-  trueFalse:    IllustrationTrueFalse,
-  quiz:         IllustrationQuiz,
-  game:         IllustrationGame,
-  riddle:       IllustrationRiddle,
-};
+// ── Palette ──────────────────────────────────────────────────────────────────
+const PINE      = "#1C4B3A";
+const PINE_DARK = "#132E23";
+const GLACIER   = "#4A8FA8";
+const PARCHMENT = "#F6F1EA";
 
+// ── Greetings ─────────────────────────────────────────────────────────────────
 const GREETINGS = [
-  { word: "Hello",       lang: "English",    phonetic: "heh-LOH"           },
-  { word: "Bonjour",     lang: "French",     phonetic: "bon-ZHOOR"         },
-  { word: "Hola",        lang: "Spanish",    phonetic: "OH-lah"            },
-  { word: "Ciao",        lang: "Italian",    phonetic: "CHOW"              },
-  { word: "Hei",         lang: "Norwegian",  phonetic: "hay"               },
-  { word: "Merhaba",     lang: "Turkish",    phonetic: "mehr-HAH-bah"      },
-  { word: "Olá",         lang: "Portuguese", phonetic: "oh-LAH"            },
-  { word: "こんにちは",    lang: "Japanese",   phonetic: "kon-nee-chee-WAH"  },
-  { word: "안녕하세요",    lang: "Korean",     phonetic: "an-nyong-ha-SEY-o" },
-  { word: "Namaste",     lang: "Hindi",      phonetic: "nah-mah-STAY"      },
-  { word: "Salut",       lang: "Romanian",   phonetic: "sah-LOOT"          },
-  { word: "Hallo",       lang: "German",     phonetic: "HAH-loh"           },
-  { word: "Привет",      lang: "Russian",    phonetic: "pree-VYET"         },
-  { word: "Γεια σου",    lang: "Greek",      phonetic: "YAH-soo"           },
-  { word: "Ahoj",        lang: "Czech",      phonetic: "ah-HOY"            },
-  { word: "Sawubona",    lang: "Zulu",       phonetic: "sah-woo-BOH-nah"   },
-  { word: "Marhaba",     lang: "Arabic",     phonetic: "mar-HAH-bah"       },
-  { word: "Nǐ hǎo",      lang: "Mandarin",   phonetic: "nee HOW"           },
-  { word: "Salam",       lang: "Persian",    phonetic: "sah-LAHM"          },
-  { word: "Halló",       lang: "Icelandic",  phonetic: "HAH-loh"           },
+  { word: "Hello",     lang: "English",    phonetic: "heh-LOH"           },
+  { word: "Bonjour",   lang: "French",     phonetic: "bon-ZHOOR"         },
+  { word: "Hola",      lang: "Spanish",    phonetic: "OH-lah"            },
+  { word: "Ciao",      lang: "Italian",    phonetic: "CHOW"              },
+  { word: "Hei",       lang: "Norwegian",  phonetic: "hay"               },
+  { word: "Merhaba",   lang: "Turkish",    phonetic: "mehr-HAH-bah"      },
+  { word: "Olá",       lang: "Portuguese", phonetic: "oh-LAH"            },
+  { word: "Namaste",   lang: "Hindi",      phonetic: "nah-mah-STAY"      },
+  { word: "Salut",     lang: "Romanian",   phonetic: "sah-LOOT"          },
+  { word: "Hallo",     lang: "German",     phonetic: "HAH-loh"           },
+  { word: "Ahoj",      lang: "Czech",      phonetic: "ah-HOY"            },
+  { word: "Sawubona",  lang: "Zulu",       phonetic: "sah-woo-BOH-nah"   },
+  { word: "Nǐ hǎo",    lang: "Mandarin",   phonetic: "nee HOW"           },
+  { word: "Halló",     lang: "Icelandic",  phonetic: "HAH-loh"           },
 ];
 
-// DiceBear pixel-art avatars via API — seeds chosen for visual variety
-const AVATARS = [
-  { seed: "Banff",      bottom: 18, right: 60,  size: 108, rotate: 4  },
-  { seed: "Explorer",   bottom: 18, right: 168, size: 96,  rotate: -3 },
-  { seed: "Rocky",      bottom: 18, right: 262, size: 114, rotate: 2  },
-  { seed: "Adventure",  bottom: 18, right: 374, size: 90,  rotate: -5 },
-];
-
-function HeroBackground() {
-  return (
-    <svg
-      viewBox="0 0 1400 320"
-      preserveAspectRatio="xMidYMax slice"
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Sky gradient layer */}
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#A8D8F0" stopOpacity="0.6"/>
-          <stop offset="100%" stopColor="#C8ECF8" stopOpacity="0.2"/>
-        </linearGradient>
-      </defs>
-      <rect width="1400" height="320" fill="url(#sky)"/>
-
-      {/* Sun */}
-      <circle cx="1280" cy="58" r="42" fill="#FFE066" fillOpacity="0.55"/>
-      <circle cx="1280" cy="58" r="54" fill="#FFE066" fillOpacity="0.2"/>
-
-      {/* Far mountains */}
-      <polygon points="0,320 180,100 360,320"    fill="#7BA8C4" fillOpacity="0.28"/>
-      <polygon points="220,320 440,60 660,320"   fill="#6E9DB8" fillOpacity="0.24"/>
-      <polygon points="500,320 730,80 960,320"   fill="#7BA8C4" fillOpacity="0.22"/>
-      <polygon points="800,320 1050,55 1240,320" fill="#6294AC" fillOpacity="0.26"/>
-      <polygon points="1100,320 1320,90 1400,320" fill="#7BA8C4" fillOpacity="0.2"/>
-
-      {/* Snow caps */}
-      <polygon points="180,100 200,68 220,100"   fill="white" fillOpacity="0.65"/>
-      <polygon points="440,60  462,26  484,60"   fill="white" fillOpacity="0.6"/>
-      <polygon points="730,80  752,44  774,80"   fill="white" fillOpacity="0.58"/>
-      <polygon points="1050,55 1072,18 1094,55"  fill="white" fillOpacity="0.62"/>
-
-      {/* Cloud 1 — large, left */}
-      <ellipse cx="140" cy="95"  rx="85" ry="34" fill="white" fillOpacity="0.88"/>
-      <ellipse cx="175" cy="74"  rx="52" ry="44" fill="white" fillOpacity="0.88"/>
-      <ellipse cx="105" cy="88"  rx="46" ry="30" fill="white" fillOpacity="0.88"/>
-
-      {/* Cloud 2 — mid */}
-      <ellipse cx="620" cy="72"  rx="68" ry="28" fill="white" fillOpacity="0.75"/>
-      <ellipse cx="652" cy="54"  rx="44" ry="36" fill="white" fillOpacity="0.75"/>
-      <ellipse cx="588" cy="66"  rx="38" ry="24" fill="white" fillOpacity="0.75"/>
-
-      {/* Cloud 3 — small, upper right */}
-      <ellipse cx="1060" cy="50" rx="52" ry="22" fill="white" fillOpacity="0.65"/>
-      <ellipse cx="1082" cy="36" rx="34" ry="28" fill="white" fillOpacity="0.65"/>
-      <ellipse cx="1038" cy="45" rx="30" ry="18" fill="white" fillOpacity="0.65"/>
-
-      {/* Foreground hills / grass */}
-      <ellipse cx="700"  cy="360" rx="820" ry="100" fill="#9ED4A0" fillOpacity="0.45"/>
-      <ellipse cx="100"  cy="370" rx="300" ry="80"  fill="#AADA9E" fillOpacity="0.38"/>
-      <ellipse cx="1320" cy="365" rx="260" ry="75"  fill="#9ED4A0" fillOpacity="0.38"/>
-
-      {/* Path/road hint at bottom */}
-      <ellipse cx="700" cy="330" rx="120" ry="18" fill="#E8D5A0" fillOpacity="0.35"/>
-    </svg>
-  );
+function sayWord(word: string, lang: string) {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(word);
+  utt.lang = lang === "Mandarin" ? "zh-CN"
+           : lang === "Japanese" ? "ja-JP"
+           : lang === "Korean"   ? "ko-KR"
+           : lang === "Arabic"   ? "ar-SA"
+           : lang === "Hindi"    ? "hi-IN"
+           : lang === "Zulu"     ? "zu-ZA"
+           : "en-US";
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
 }
 
-export default function Home() {
-  const router = useRouter();
-  const [greeting, setGreeting] = useState(GREETINGS[0]);
-
-  useEffect(() => {
-    setGreeting(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
-  }, []);
-
+// ── Mountain hero card ────────────────────────────────────────────────────────
+function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#D6EEF8", overflowX: "hidden" }}>
-
-      {/* ── Top header bar ───────────────────────────────────────────────── */}
-      <header style={{
-        background: "linear-gradient(135deg, #4A90D9 0%, #5B4FCF 100%)",
-        padding: "0 24px",
-        height: 58,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 10,
-        boxShadow: "0 2px 12px rgba(74,100,210,0.35)",
-      }}>
+    <div style={{
+      position: "relative",
+      overflow: "hidden",
+      borderRadius: 0,
+      background: `linear-gradient(175deg, ${GLACIER} 0%, ${PINE} 55%, ${PINE_DARK} 100%)`,
+      margin: 0,
+      padding: "28px 24px 88px",
+    }}>
+      {/* Top row: language badge + Say it */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <span style={{
-          fontFamily: "var(--font-display, sans-serif)",
-          fontSize: 17,
-          fontWeight: 800,
-          letterSpacing: "-0.01em",
-          color: "#fff",
-          textShadow: "0 1px 3px rgba(0,0,0,0.2)",
+          fontFamily: "var(--font-sans)",
+          fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "rgba(255,255,255,0.7)",
+          background: "rgba(255,255,255,0.12)",
+          border: "1px solid rgba(255,255,255,0.18)",
+          borderRadius: 20, padding: "4px 12px",
         }}>
-          🏔 Banff Road Trip
+          {greeting.lang}
         </span>
-        <span style={{
-          fontFamily: "var(--font-sans, sans-serif)",
-          fontSize: 13,
-          fontWeight: 600,
-          color: "rgba(255,255,255,0.8)",
-          background: "rgba(255,255,255,0.15)",
-          padding: "4px 12px",
-          borderRadius: 20,
-        }}>
-          Jun 17–19
-        </span>
-      </header>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div style={{
-        position: "relative",
-        background: "linear-gradient(180deg, #B8E0F5 0%, #CBE9F7 60%, #D6EEF8 100%)",
-        padding: "32px 32px 48px",
-        overflow: "hidden",
-        minHeight: 160,
-      }}>
-        <HeroBackground />
-
-        {/* Text — left side, z above scene, capped so avatars don't overlap */}
-        <div style={{ position: "relative", zIndex: 2, maxWidth: "55%" }}>
-          <h1 style={{
-            fontFamily: "var(--font-display, sans-serif)",
-            fontSize: "clamp(52px, 9vw, 120px)",
-            fontWeight: 900,
-            color: "#1A3A5C",
-            letterSpacing: "-0.04em",
-            lineHeight: 1.0,
-            margin: "0 0 8px",
-            whiteSpace: "nowrap",
-            textShadow: "0 3px 0 rgba(255,255,255,0.55)",
-          }}>
-            {greeting.word}!
-          </h1>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10, margin: 0 }}>
-            <span style={{
-              fontFamily: "var(--font-sans, sans-serif)",
-              fontSize: "clamp(12px, 1.4vw, 15px)",
-              fontWeight: 700,
-              color: "#2E6DA4",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-            }}>
-              {greeting.lang}
-            </span>
-            <span style={{
-              fontFamily: "var(--font-mono, monospace)",
-              fontSize: "clamp(11px, 1.1vw, 13px)",
-              fontWeight: 400,
-              color: "#5A90B8",
-              fontStyle: "italic",
-              letterSpacing: "0.01em",
-            }}>
-              /{greeting.phonetic}/
-            </span>
-          </div>
-        </div>
-
-        {/* DiceBear pixel-art characters — right side, sitting on the grass */}
-        <div className="hero-avatars" style={{
-          position: "absolute",
-          bottom: 0,
-          right: 40,
-          display: "flex",
-          alignItems: "flex-end",
-          gap: 8,
-          zIndex: 3,
-        }}>
-          {AVATARS.map((a) => (
-            <img
-              key={a.seed}
-              src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${a.seed}&backgroundColor=transparent`}
-              alt=""
-              aria-hidden="true"
-              style={{
-                width: a.size,
-                height: a.size,
-                transform: `rotate(${a.rotate}deg)`,
-                filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.15))",
-                imageRendering: "pixelated",
-              }}
-            />
-          ))}
-        </div>
+        <button
+          onClick={() => sayWord(greeting.word, greeting.lang)}
+          aria-label={`Pronounce ${greeting.word}`}
+          style={{
+            background: "rgba(255,255,255,0.14)",
+            border: "1px solid rgba(255,255,255,0.22)",
+            borderRadius: 20,
+            color: "rgba(255,255,255,0.9)",
+            fontFamily: "var(--font-sans)",
+            fontSize: 12, fontWeight: 600,
+            padding: "5px 14px", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 5,
+          }}
+        >
+          <span>🔊</span> Say it
+        </button>
       </div>
 
-      {/* ── Category grid ─────────────────────────────────────────────────── */}
-      <main className="home-grid" style={{ padding: "28px 20px 40px" }}>
-        {ALL_TYPES.map((type) => {
-          const meta = CATEGORY_META[type];
-          const Illustration = ILLUSTRATIONS[type];
+      {/* The word */}
+      <div style={{ textAlign: "center" }}>
+        <p style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(56px, 14vw, 88px)",
+          fontWeight: 900,
+          color: "#fff",
+          margin: 0, lineHeight: 1,
+          letterSpacing: "-0.02em",
+          textShadow: "0 2px 20px rgba(0,0,0,0.25)",
+        }}>
+          {greeting.word}
+        </p>
+        <p style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 14, fontStyle: "italic",
+          color: "rgba(255,255,255,0.58)",
+          margin: "10px 0 0", letterSpacing: "0.02em",
+        }}>
+          / {greeting.phonetic} /
+        </p>
+      </div>
 
-          return (
-            <button
-              key={type}
-              onClick={() => router.push(`/${TYPE_TO_SLUG[type]}`)}
-              className="home-card"
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                textAlign: "left",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
-                className="home-tile"
-                style={{
-                  backgroundColor: meta.color,
-                  aspectRatio: "1 / 1",
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  padding: "12%",
-                  boxSizing: "border-box",
-                  boxShadow: "0 4px 0 rgba(0,0,0,0.18)",
-                  border: "3px solid rgba(0,0,0,0.08)",
-                  transition: "transform 120ms ease, box-shadow 120ms ease",
-                }}
-              >
-                <Illustration />
-              </div>
-
-              <div style={{ padding: "10px 4px 0" }}>
-                <p style={{
-                  fontFamily: "var(--font-display, sans-serif)",
-                  fontSize: "clamp(14px, 1.7vw, 18px)",
-                  fontWeight: 800,
-                  color: "#1A3A5C",
-                  letterSpacing: "-0.01em",
-                  lineHeight: 1.2,
-                  margin: "0 0 3px",
-                }}>
-                  {meta.label}
-                </p>
-                <p style={{
-                  fontFamily: "var(--font-sans, sans-serif)",
-                  fontSize: "clamp(12px, 1.1vw, 14px)",
-                  fontWeight: 500,
-                  color: "#4A7FA8",
-                  margin: 0,
-                  lineHeight: 1.4,
-                }}>
-                  {meta.tagline}
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </main>
-
-      <style>{`
-        .home-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-          max-width: 960px;
-          margin: 0 auto;
-          box-sizing: border-box;
-        }
-
-        .home-card:hover .home-tile {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 0 rgba(0,0,0,0.15) !important;
-        }
-
-        .home-card:active .home-tile {
-          transform: translateY(2px);
-          box-shadow: 0 2px 0 rgba(0,0,0,0.18) !important;
-        }
-
-        /* Hide avatars on small screens to avoid overlap */
-        @media (max-width: 700px) {
-          .home-grid {
-            grid-template-columns: 1fr;
-            gap: 14px;
-            padding: 20px 16px 40px !important;
-          }
-          .hero-avatars {
-            display: none;
-          }
-          .home-tile {
-            border-radius: 14px !important;
-          }
-        }
-
-        @media (max-width: 900px) {
-          .hero-avatars img {
-            width: 72px !important;
-            height: 72px !important;
-          }
-        }
-      `}</style>
+      {/* Mountain silhouette layers */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 90 }} aria-hidden>
+        <svg viewBox="0 0 200 45" preserveAspectRatio="none" width="100%" height="100%">
+          {/* Distant range — lighter */}
+          <path
+            d="M0,45 L0,30 L12,20 L22,27 L35,12 L48,23 L58,17 L70,22 L82,10 L95,20 L108,14 L120,22 L132,8 L145,18 L158,13 L170,20 L182,15 L200,22 L200,45 Z"
+            fill="rgba(255,255,255,0.10)"
+          />
+          {/* Mid range */}
+          <path
+            d="M0,45 L0,36 L18,26 L30,32 L44,20 L56,28 L68,22 L80,29 L95,18 L110,26 L124,20 L138,27 L152,16 L165,24 L178,19 L200,26 L200,45 Z"
+            fill="rgba(255,255,255,0.08)"
+          />
+          {/* Foreground ridge — darkest */}
+          <path
+            d="M0,45 L0,40 L20,34 L32,38 L46,28 L58,35 L72,30 L85,36 L100,25 L114,33 L128,27 L142,34 L156,29 L170,35 L184,30 L200,36 L200,45 Z"
+            fill={PINE_DARK}
+            fillOpacity="0.7"
+          />
+        </svg>
+      </div>
     </div>
   );
 }
+
+// ── Activity card ─────────────────────────────────────────────────────────────
+function ActivityCard({
+  type, selected, onSelect,
+}: {
+  type: ActivityType;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const meta = CATEGORY_META[type];
+  return (
+    <button
+      onClick={onSelect}
+      aria-pressed={selected}
+      style={{
+        background: selected ? meta.color : "#fff",
+        border: `2.5px solid ${selected ? meta.color : "rgba(0,0,0,0.07)"}`,
+        borderRadius: 18,
+        padding: "20px 16px 18px",
+        display: "flex", flexDirection: "column", gap: 10,
+        textAlign: "left", cursor: "pointer", width: "100%",
+        transition: "transform 140ms ease, box-shadow 140ms ease, background 160ms ease, border-color 160ms ease",
+        boxShadow: selected
+          ? `0 6px 20px ${meta.color}44, 0 2px 6px ${meta.color}22`
+          : "0 2px 8px rgba(0,0,0,0.06)",
+        transform: selected ? "scale(1.03)" : "scale(1)",
+        minHeight: 140,
+      }}
+    >
+      <span style={{ fontSize: 34, lineHeight: 1 }}>{meta.emoji}</span>
+      <div>
+        <p style={{
+          fontFamily: "var(--font-display)",
+          fontSize: 15, fontWeight: 700,
+          color: selected ? "#fff" : "#1A1A1A",
+          margin: 0, lineHeight: 1.2,
+          letterSpacing: "-0.01em",
+        }}>
+          {meta.label}
+        </p>
+        <p style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 12, fontWeight: 500,
+          color: selected ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.42)",
+          margin: "3px 0 0", lineHeight: 1.4,
+        }}>
+          {meta.tagline}
+        </p>
+      </div>
+    </button>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+export default function Home() {
+  const router = useRouter();
+  const [greeting,      setGreeting]      = useState<typeof GREETINGS[number] | null>(null);
+  const [settings,      setSettings]      = useState<AppSettings>({ soundEnabled: true, banffMode: false, gpsMode: false });
+  const [arrivalISO,    setArrivalISO]    = useState<string | null>(null);
+  const [showSettings,  setShowSettings]  = useState(false);
+  const [showLog,       setShowLog]       = useState(false);
+  const [selectedType,  setSelectedType]  = useState<ActivityType | null>(null);
+
+  useEffect(() => {
+    setGreeting(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
+    setSettings(getSettings());
+    setArrivalISO(getArrivalTime());
+  }, []);
+
+  const handleSettingsUpdate = (s: AppSettings) => {
+    setSettings(s);
+    setArrivalISO(getArrivalTime());
+  };
+
+  const handleSelect = (type: ActivityType) => {
+    setSelectedType(prev => prev === type ? null : type);
+  };
+
+  const handleGo = () => {
+    if (!selectedType) return;
+    router.push(`/${TYPE_TO_SLUG[selectedType]}${settings.banffMode ? "?banff=1" : ""}`);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", backgroundColor: PARCHMENT, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header style={{
+        backgroundColor: PARCHMENT,
+        padding: "0 20px",
+        height: 56,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        position: "sticky", top: 0, zIndex: 20,
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }} suppressHydrationWarning>
+          <span style={{ fontSize: 18 }}>🏔</span>
+          <span style={{
+            fontFamily: "var(--font-display)",
+            fontSize: 16, fontWeight: 700,
+            color: PINE, letterSpacing: "-0.02em",
+          }}>
+            Banff Road Trip
+          </span>
+          {settings.banffMode && (
+            <span style={{
+              fontFamily: "var(--font-sans)", fontSize: 10, fontWeight: 700,
+              color: "#fff", background: PINE,
+              padding: "3px 9px", borderRadius: 20, letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}>
+              Banff
+            </span>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: 6 }}>
+          <button onClick={() => setShowLog(true)} aria-label="Trip log"
+            style={iconBtnStyle}>📓</button>
+          <button onClick={() => setShowSettings(true)} aria-label="Settings"
+            style={iconBtnStyle}>⚙️</button>
+        </div>
+      </header>
+
+      {/* ── Countdown ────────────────────────────────────────────────── */}
+      <CountdownBanner
+        arrivalISO={arrivalISO}
+        soundEnabled={settings.soundEnabled}
+        gpsMode={settings.gpsMode}
+      />
+
+      {/* ── Word of the Day ──────────────────────────────────────────── */}
+      {greeting && <WordCard greeting={greeting} />}
+      {!greeting && <div style={{ height: 24 }} />}
+
+      {/* ── Section label ────────────────────────────────────────────── */}
+      <div style={{ padding: "4px 24px 16px" }}>
+        <p style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: "rgba(0,0,0,0.35)", margin: 0,
+        }}>
+          Pick an activity
+        </p>
+      </div>
+
+      {/* ── Activity grid ────────────────────────────────────────────── */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 14,
+        padding: "0 20px",
+        maxWidth: 640, margin: "0 auto",
+      }}>
+        {ALL_TYPES.map(type => (
+          <ActivityCard
+            key={type}
+            type={type}
+            selected={selectedType === type}
+            onSelect={() => handleSelect(type)}
+          />
+        ))}
+      </div>
+
+      {/* ── Let's go CTA ─────────────────────────────────────────────── */}
+      {selectedType && (
+        <div
+          className="animate-slide-up"
+          style={{
+            position: "sticky",
+            bottom: 0,
+            padding: "16px 20px",
+            paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))",
+            background: `linear-gradient(to top, ${PARCHMENT} 70%, transparent)`,
+            marginTop: 20,
+          }}
+        >
+          <button
+            onClick={handleGo}
+            style={{
+              width: "100%",
+              background: CATEGORY_META[selectedType].color,
+              color: "#fff",
+              border: "none",
+              borderRadius: 18,
+              padding: "18px 24px",
+              fontFamily: "var(--font-display)",
+              fontWeight: 900, fontSize: 18,
+              letterSpacing: "-0.01em",
+              cursor: "pointer",
+              boxShadow: `0 6px 0 rgba(0,0,0,0.18), 0 8px 24px ${CATEGORY_META[selectedType].color}44`,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              transition: "transform 100ms ease, box-shadow 100ms ease",
+            }}
+            onMouseDown={e => (e.currentTarget.style.transform = "translateY(3px)", e.currentTarget.style.boxShadow = `0 3px 0 rgba(0,0,0,0.18)`)}
+            onMouseUp={e => (e.currentTarget.style.transform = "", e.currentTarget.style.boxShadow = "")}
+            onTouchStart={e => (e.currentTarget.style.transform = "translateY(3px)", e.currentTarget.style.boxShadow = `0 3px 0 rgba(0,0,0,0.18)`)}
+            onTouchEnd={e => (e.currentTarget.style.transform = "", e.currentTarget.style.boxShadow = "")}
+          >
+            Let's go! <span style={{ fontSize: 20 }}>→</span>
+          </button>
+        </div>
+      )}
+
+      {/* Bottom breathing room when no CTA */}
+      {!selectedType && <div style={{ height: 48 }} />}
+
+      {/* ── Overlays ─────────────────────────────────────────────────── */}
+      {showSettings && (
+        <SettingsPanel
+          settings={settings}
+          onUpdate={handleSettingsUpdate}
+          onClose={() => setShowSettings(false)}
+          onOpenLog={() => setShowLog(true)}
+        />
+      )}
+      {showLog && <TripLogPanel onClose={() => setShowLog(false)} />}
+    </div>
+  );
+}
+
+const iconBtnStyle: React.CSSProperties = {
+  width: 36, height: 36, borderRadius: 10,
+  border: "none", background: "rgba(0,0,0,0.06)",
+  cursor: "pointer", fontSize: 16,
+  display: "flex", alignItems: "center", justifyContent: "center",
+};

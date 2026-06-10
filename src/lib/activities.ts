@@ -10,6 +10,7 @@ export interface Activity {
   options?: string[];
   hint?: string;
   points: number;
+  banff?: boolean; // Banff-specific content
 }
 
 export const activities: Activity[] = [

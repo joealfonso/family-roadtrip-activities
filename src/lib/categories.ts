@@ -19,16 +19,17 @@ export const TYPE_TO_SLUG: Record<ActivityType, string> = {
 };
 
 export const CATEGORY_META: Record<ActivityType, {
-  color: string;
-  label: string;
+  color:   string;
+  label:   string;
   tagline: string;
+  emoji:   string;
 }> = {
-  conversation: { color: "#E8472A", label: "Talk It Out",  tagline: "Start a conversation"   },
-  fact:         { color: "#2F9E6E", label: "Fun Fact",      tagline: "Learn something wild"   },
-  trueFalse:    { color: "#1B72C0", label: "True or False", tagline: "Think you know?"        },
-  quiz:         { color: "#C98A00", label: "Quiz Time",     tagline: "Test the crew"          },
-  game:         { color: "#7048B6", label: "Mini Game",     tagline: "Everyone gets involved" },
-  riddle:       { color: "#C93475", label: "Riddle",        tagline: "Figure it out"          },
+  conversation: { color: "#E8472A", label: "Talk It Out",  tagline: "Spark a real conversation",  emoji: "💬" },
+  fact:         { color: "#2F9E6E", label: "Fun Fact",      tagline: "Learn something wild",        emoji: "💡" },
+  trueFalse:    { color: "#1B72C0", label: "True or False", tagline: "Think you know?",             emoji: "🤔" },
+  quiz:         { color: "#C98A00", label: "Quiz Time",     tagline: "Test the whole crew",         emoji: "🧠" },
+  game:         { color: "#7048B6", label: "Mini Game",     tagline: "Everyone gets involved",      emoji: "🎮" },
+  riddle:       { color: "#C93475", label: "Riddle",        tagline: "Can you figure it out?",      emoji: "🔍" },
 };
 
 export const ALL_TYPES: ActivityType[] = [

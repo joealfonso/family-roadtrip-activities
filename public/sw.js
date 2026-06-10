@@ -1,40 +1,83 @@
-const CACHE_NAME = "banff-trip-v1";
-const OFFLINE_URLS = ["/", "/_next/static/"];
+// Banff Road Trip — Service Worker
+// Strategy: cache-first for static assets, network-first for pages (fallback to cache)
+
+const CACHE  = "banff-trip-v3";
+const STATIC = "banff-static-v3";
+
+// Pre-cache these on install so the app works immediately offline
+const PRECACHE = [
+  "/",
+  "/talk",
+  "/fact",
+  "/truefalse",
+  "/quiz",
+  "/game",
+  "/riddle",
+  "/manifest.json",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll(["/"])
-    )
+    caches.open(CACHE).then((cache) =>
+      cache.addAll(PRECACHE).catch(() => {
+        // Some URLs may 404 during build — don't fail the whole install
+      })
+    ).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+      Promise.all(
+        keys
+          .filter((k) => k !== CACHE && k !== STATIC)
+          .map((k) => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+  const { request } = event;
+  const url = new URL(request.url);
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const networkFetch = fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+  // Skip non-GET and cross-origin (e.g. DiceBear, Google Fonts)
+  if (request.method !== "GET" || url.origin !== self.location.origin) return;
+
+  const isStatic = url.pathname.startsWith("/_next/static/") ||
+                   url.pathname.startsWith("/icons/") ||
+                   url.pathname.endsWith(".png") ||
+                   url.pathname.endsWith(".ico") ||
+                   url.pathname === "/manifest.json";
+
+  if (isStatic) {
+    // Cache-first: static assets never change (content-hashed)
+    event.respondWith(
+      caches.match(request).then((cached) =>
+        cached || fetch(request).then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(STATIC).then((c) => c.put(request, clone));
           }
-          return response;
+          return res;
         })
-        .catch(() => cached);
-
-      return cached || networkFetch;
-    })
-  );
+      )
+    );
+  } else {
+    // Network-first for pages: try network, fall back to cache
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then((c) => c.put(request, clone));
+          }
+          return res;
+        })
+        .catch(() => caches.match(request).then((cached) =>
+          cached || caches.match("/")
+        ))
+    );
+  }
 });
