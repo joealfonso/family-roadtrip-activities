@@ -80,7 +80,7 @@ body {
 }
 
 .activity-card {
-  padding: 28px 24px;
+  padding: 40px 32px;
 }
 
 /* Mobile: single column stack */
@@ -93,7 +93,7 @@ body {
     padding: 56px 48px 140px;
   }
   .activity-card {
-    padding: 36px 32px;
+    padding: 52px 44px;
   }
   .activity-grid {
     grid-template-columns: 1fr 1fr;
@@ -105,8 +105,8 @@ body {
     padding: 88px 72px 180px;
   }
   .activity-card {
-    padding: 52px 44px;
-    gap: 18px;
+    padding: 72px 60px;
+    gap: 20px;
   }
   .activity-grid {
     grid-template-columns: 1fr 1fr 1fr;

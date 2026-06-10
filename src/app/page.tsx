@@ -231,12 +231,13 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
       onClick={onSelect}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="activity-card"
       style={{
         background: hovered ? `${meta.color}12` : "none",
         border: "none",
         borderBottom: "1px solid rgba(0,0,0,0.06)",
         borderRight: "1px solid rgba(0,0,0,0.06)",
-        display: "flex", flexDirection: "column", gap: 10,
+        display: "flex", flexDirection: "column", gap: 16,
         textAlign: "left", cursor: "pointer", width: "100%",
         WebkitTapHighlightColor: "transparent",
         transition: "background 140ms ease",
