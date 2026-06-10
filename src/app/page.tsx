@@ -138,6 +138,53 @@ function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
   );
 }
 
+// ── Flat icons ────────────────────────────────────────────────────────────────
+const FLAT_ICONS: Record<ActivityType, (color: string) => React.ReactNode> = {
+  conversation: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M4 6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H14l-5 4v-4H6a2 2 0 0 1-2-2V6Z" stroke={c} strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M10 22v2a2 2 0 0 0 2 2h12l5 4v-4h1a2 2 0 0 0 2-2v-8" stroke={c} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  ),
+  fact: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M18 4C12.477 4 8 8.477 8 14c0 3.72 1.98 6.98 4.95 8.78V26h10v-3.22A10 10 0 0 0 28 14c0-5.523-4.477-10-10-10Z" stroke={c} strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M13 26h10M14 30h8" stroke={c} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M15 14h.01M18 11v6M21 14h.01" stroke={c} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  ),
+  trueFalse: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <polyline points="5,19 11,26 21,10" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <line x1="25" y1="10" x2="33" y2="26" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="33" y1="10" x2="25" y2="26" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  ),
+  quiz: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M13 13a5 5 0 0 1 9.9 1c0 3-4.9 4-4.9 7" stroke={c} strokeWidth="2.2" strokeLinecap="round"/>
+      <circle cx="18" cy="27" r="1.5" fill={c}/>
+    </svg>
+  ),
+  game: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <rect x="4" y="12" width="28" height="16" rx="8" stroke={c} strokeWidth="2"/>
+      <line x1="11" y1="17" x2="11" y2="23" stroke={c} strokeWidth="2" strokeLinecap="round"/>
+      <line x1="8" y1="20" x2="14" y2="20" stroke={c} strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="23" cy="18" r="1.5" fill={c}/>
+      <circle cx="27" cy="21" r="1.5" fill={c}/>
+      <circle cx="23" cy="24" r="1.5" fill={c}/>
+      <circle cx="19" cy="21" r="1.5" fill={c}/>
+    </svg>
+  ),
+  riddle: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="16" cy="16" r="9" stroke={c} strokeWidth="2"/>
+      <line x1="22.5" y1="22.5" x2="31" y2="31" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  ),
+};
+
 // ── Activity card ─────────────────────────────────────────────────────────────
 function ActivityCard({
   type, selected, onSelect,
@@ -147,40 +194,37 @@ function ActivityCard({
   onSelect: () => void;
 }) {
   const meta = CATEGORY_META[type];
+  const iconColor = selected ? meta.color : "rgba(0,0,0,0.30)";
   return (
     <button
       onClick={onSelect}
       aria-pressed={selected}
       style={{
-        background: selected ? meta.color : "#fff",
-        border: `2.5px solid ${selected ? meta.color : "rgba(0,0,0,0.07)"}`,
-        borderRadius: 18,
-        padding: "20px 16px 18px",
-        display: "flex", flexDirection: "column", gap: 10,
+        background: "none",
+        border: "none",
+        borderLeft: `3px solid ${selected ? meta.color : "transparent"}`,
+        padding: "16px 14px",
+        display: "flex", flexDirection: "column", gap: 8,
         textAlign: "left", cursor: "pointer", width: "100%",
-        transition: "transform 140ms ease, box-shadow 140ms ease, background 160ms ease, border-color 160ms ease",
-        boxShadow: selected
-          ? `0 6px 20px ${meta.color}44, 0 2px 6px ${meta.color}22`
-          : "0 2px 8px rgba(0,0,0,0.06)",
-        transform: selected ? "scale(1.03)" : "scale(1)",
-        minHeight: 140,
+        transition: "border-color 160ms ease",
       }}
     >
-      <span style={{ fontSize: 34, lineHeight: 1 }}>{meta.emoji}</span>
+      {FLAT_ICONS[type](iconColor)}
       <div>
         <p style={{
           fontFamily: "var(--font-display)",
           fontSize: 15, fontWeight: 700,
-          color: selected ? "#fff" : "#1A1A1A",
+          color: selected ? meta.color : "#1A1A1A",
           margin: 0, lineHeight: 1.2,
           letterSpacing: "-0.01em",
+          transition: "color 160ms ease",
         }}>
           {meta.label}
         </p>
         <p style={{
           fontFamily: "var(--font-sans)",
           fontSize: 12, fontWeight: 500,
-          color: selected ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.42)",
+          color: "rgba(0,0,0,0.42)",
           margin: "3px 0 0", lineHeight: 1.4,
         }}>
           {meta.tagline}
@@ -198,7 +242,6 @@ export default function Home() {
   const [arrivalISO,    setArrivalISO]    = useState<string | null>(null);
   const [showSettings,  setShowSettings]  = useState(false);
   const [showLog,       setShowLog]       = useState(false);
-  const [selectedType,  setSelectedType]  = useState<ActivityType | null>(null);
 
   useEffect(() => {
     setGreeting(GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
@@ -211,16 +254,7 @@ export default function Home() {
     setArrivalISO(getArrivalTime());
   };
 
-  const handleSelect = (type: ActivityType) => {
-    setSelectedType(prev => prev === type ? null : type);
-  };
-
-  const handleGo = () => {
-    if (!selectedType) return;
-    router.push(`/${TYPE_TO_SLUG[selectedType]}${settings.banffMode ? "?banff=1" : ""}`);
-  };
-
-  return (
+return (
     <div style={{ minHeight: "100vh", backgroundColor: PARCHMENT, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
 
       {/* ── Header ───────────────────────────────────────────────────── */}
@@ -272,78 +306,7 @@ export default function Home() {
       {greeting && <WordCard greeting={greeting} />}
       {!greeting && <div style={{ height: 24 }} />}
 
-      {/* ── Section label ────────────────────────────────────────────── */}
-      <div style={{ padding: "4px 24px 16px" }}>
-        <p style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          color: "rgba(0,0,0,0.35)", margin: 0,
-        }}>
-          Pick an activity
-        </p>
-      </div>
-
-      {/* ── Activity grid ────────────────────────────────────────────── */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 14,
-        padding: "0 20px",
-        maxWidth: 640, margin: "0 auto",
-      }}>
-        {ALL_TYPES.map(type => (
-          <ActivityCard
-            key={type}
-            type={type}
-            selected={selectedType === type}
-            onSelect={() => handleSelect(type)}
-          />
-        ))}
-      </div>
-
-      {/* ── Let's go CTA ─────────────────────────────────────────────── */}
-      {selectedType && (
-        <div
-          className="animate-slide-up"
-          style={{
-            position: "sticky",
-            bottom: 0,
-            padding: "16px 20px",
-            paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))",
-            background: `linear-gradient(to top, ${PARCHMENT} 70%, transparent)`,
-            marginTop: 20,
-          }}
-        >
-          <button
-            onClick={handleGo}
-            style={{
-              width: "100%",
-              background: CATEGORY_META[selectedType].color,
-              color: "#fff",
-              border: "none",
-              borderRadius: 18,
-              padding: "18px 24px",
-              fontFamily: "var(--font-display)",
-              fontWeight: 900, fontSize: 18,
-              letterSpacing: "-0.01em",
-              cursor: "pointer",
-              boxShadow: `0 6px 0 rgba(0,0,0,0.18), 0 8px 24px ${CATEGORY_META[selectedType].color}44`,
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              transition: "transform 100ms ease, box-shadow 100ms ease",
-            }}
-            onMouseDown={e => (e.currentTarget.style.transform = "translateY(3px)", e.currentTarget.style.boxShadow = `0 3px 0 rgba(0,0,0,0.18)`)}
-            onMouseUp={e => (e.currentTarget.style.transform = "", e.currentTarget.style.boxShadow = "")}
-            onTouchStart={e => (e.currentTarget.style.transform = "translateY(3px)", e.currentTarget.style.boxShadow = `0 3px 0 rgba(0,0,0,0.18)`)}
-            onTouchEnd={e => (e.currentTarget.style.transform = "", e.currentTarget.style.boxShadow = "")}
-          >
-            Let's go! <span style={{ fontSize: 20 }}>→</span>
-          </button>
-        </div>
-      )}
-
-      {/* Bottom breathing room when no CTA */}
-      {!selectedType && <div style={{ height: 48 }} />}
+      <div style={{ height: 48 }} />
 
       {/* ── Overlays ─────────────────────────────────────────────────── */}
       {showSettings && (
