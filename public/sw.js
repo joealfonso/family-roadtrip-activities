@@ -10,7 +10,7 @@ const STATIC_CACHE = "banff-static-v8";
 
 // Pages to pre-cache during install so the app works offline immediately
 const PAGES = [
-  "/", "/talk", "/fact", "/truefalse", "/quiz", "/game", "/riddle", "/rhyme",
+  "/", "/talk", "/fact", "/truefalse", "/quiz", "/game", "/riddle", "/rhyme", "/spinner",
   "/nearby",
   "/waypoint/revelstoke", "/waypoint/glaciernp", "/waypoint/yoho",
   "/waypoint/canmore", "/waypoint/johnstoncanyon", "/waypoint/lakelouise",
