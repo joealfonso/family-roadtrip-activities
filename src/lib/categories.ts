@@ -7,6 +7,7 @@ export const SLUG_TO_TYPE: Record<string, ActivityType> = {
   quiz:      "quiz",
   game:      "game",
   riddle:    "riddle",
+  rhyme:     "rhyme",
 };
 
 export const TYPE_TO_SLUG: Record<ActivityType, string> = {
@@ -16,6 +17,7 @@ export const TYPE_TO_SLUG: Record<ActivityType, string> = {
   quiz:         "quiz",
   game:         "game",
   riddle:       "riddle",
+  rhyme:        "rhyme",
 };
 
 export const CATEGORY_META: Record<ActivityType, {
@@ -30,8 +32,9 @@ export const CATEGORY_META: Record<ActivityType, {
   quiz:         { color: "#C98A00", label: "Quiz Time",     tagline: "Test the whole crew",         emoji: "🧠" },
   game:         { color: "#7048B6", label: "Mini Game",     tagline: "Everyone gets involved",      emoji: "🎮" },
   riddle:       { color: "#C93475", label: "Riddle",        tagline: "Can you figure it out?",      emoji: "🔍" },
+  rhyme:        { color: "#D97706", label: "Rhyme Time",    tagline: "Verse, rap, and wordplay",    emoji: "🎤" },
 };
 
 export const ALL_TYPES: ActivityType[] = [
-  "conversation", "fact", "trueFalse", "quiz", "game", "riddle",
+  "conversation", "fact", "trueFalse", "quiz", "game", "riddle", "rhyme",
 ];

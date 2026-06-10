@@ -4,7 +4,7 @@ import { ActivityType } from "@/lib/activities";
 import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
 import {
   IllustrationTalk, IllustrationFact, IllustrationTrueFalse,
-  IllustrationQuiz, IllustrationGame, IllustrationRiddle,
+  IllustrationQuiz, IllustrationGame, IllustrationRiddle, IllustrationRhyme,
 } from "@/components/CategoryIcons";
 
 const ILLUSTRATIONS: Record<ActivityType, () => JSX.Element> = {
@@ -14,6 +14,7 @@ const ILLUSTRATIONS: Record<ActivityType, () => JSX.Element> = {
   quiz:         IllustrationQuiz,
   game:         IllustrationGame,
   riddle:       IllustrationRiddle,
+  rhyme:        IllustrationRhyme,
 };
 
 interface Props {

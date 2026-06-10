@@ -160,6 +160,37 @@ export default function ActivityDisplay({ activity, onNext, accentColor, soundEn
           </div>
         )}
 
+        {/* ── Rhyme Time ── */}
+        {activity.type === "rhyme" && (
+          <div style={{ marginBottom: 24 }}>
+            {!revealed ? (
+              <button
+                onClick={() => { setRevealed(true); sfx(playReveal); }}
+                style={{
+                  fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, fontWeight: 600,
+                  color: accentColor, textDecoration: "underline", textUnderlineOffset: 3,
+                  background: "none", border: "none", cursor: "pointer", padding: 0,
+                }}
+              >
+                💡 Show an example
+              </button>
+            ) : (
+              <div className="animate-pop-in" style={{
+                backgroundColor: "#FFFBF0",
+                border: "1px solid #F0D98A",
+                borderRadius: 12, padding: "14px 16px",
+              }}>
+                <p style={{ fontFamily: "var(--font-sans,sans-serif)", fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#C98A00", margin: "0 0 6px" }}>
+                  Example
+                </p>
+                <p style={{ fontFamily: "var(--font-sans,sans-serif)", fontSize: 15, lineHeight: 1.65, color: "#555", fontStyle: "italic", margin: 0 }}>
+                  {activity.hint}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ── Riddle ── */}
         {activity.type === "riddle" && (
           <div style={{ marginBottom: 24 }}>

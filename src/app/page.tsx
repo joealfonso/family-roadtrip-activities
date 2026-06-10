@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import type { ActivityType } from "@/lib/activities";
 import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
 import { getSettings, AppSettings } from "@/lib/store";
+import { WAYPOINTS } from "@/lib/waypoints";
 import SettingsPanel from "@/components/SettingsPanel";
 import TripLogPanel  from "@/components/TripLogPanel";
 
@@ -220,6 +221,13 @@ const FLAT_ICONS: Record<ActivityType, (color: string) => React.ReactNode> = {
       <line x1="22.5" y1="22.5" x2="31" y2="31" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
   ),
+  rhyme: (c) => (
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
+      <circle cx="10" cy="22" r="4" stroke={c} strokeWidth="2"/>
+      <circle cx="24" cy="26" r="4" stroke={c} strokeWidth="2"/>
+      <path d="M14 22V10h10v14" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
 };
 
 // ── Activity card ─────────────────────────────────────────────────────────────
@@ -328,6 +336,110 @@ return (
 
       {/* ── Word of the Day ──────────────────────────────────────────── */}
       <WordCard greeting={greeting} onCycle={cycleGreeting} />
+
+      {/* ── Route Strip ──────────────────────────────────────────────── */}
+      <div style={{ padding: "20px 0 4px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+        <div style={{ padding: "0 20px 12px", display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <p style={{
+            fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 800,
+            color: "#1A1A1A", margin: 0, letterSpacing: "-0.01em",
+          }}>Your Route</p>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "#aaa", margin: 0 }}>
+            Jun 10–20 · 11 days
+          </p>
+        </div>
+
+        {/* Horizontal scroll row */}
+        <div style={{
+          display: "flex", gap: 10, overflowX: "auto",
+          padding: "0 20px 16px",
+          scrollbarWidth: "none",
+          WebkitOverflowScrolling: "touch",
+        }}>
+          {/* Near Me card — always first */}
+          <button
+            onClick={() => router.push("/nearby")}
+            style={{
+              flexShrink: 0,
+              background: "linear-gradient(135deg, #1C4B3A 0%, #4A8FA8 100%)",
+              border: "none",
+              borderRadius: 14,
+              padding: "12px 14px",
+              cursor: "pointer",
+              textAlign: "left",
+              width: 120,
+              boxShadow: "0 2px 8px rgba(28,75,58,0.25)",
+              transition: "transform 120ms ease, box-shadow 120ms ease",
+              WebkitTapHighlightColor: "transparent",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(28,75,58,0.35)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(28,75,58,0.25)";
+            }}
+          >
+            <p style={{ fontSize: 22, margin: "0 0 6px", lineHeight: 1 }}>📍</p>
+            <p style={{
+              fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 700,
+              color: "#fff", margin: "0 0 4px", lineHeight: 1.2,
+            }}>
+              Near Me
+            </p>
+            <p style={{
+              fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 600,
+              color: "rgba(255,255,255,0.65)", margin: 0,
+            }}>
+              Use location
+            </p>
+          </button>
+
+          {WAYPOINTS.map((wp) => (
+            <button
+              key={wp.id}
+              onClick={() => router.push(`/waypoint/${wp.id}`)}
+              style={{
+                flexShrink: 0,
+                background: "#fff",
+                border: "1.5px solid rgba(0,0,0,0.07)",
+                borderRadius: 14,
+                padding: "12px 14px",
+                cursor: "pointer",
+                textAlign: "left",
+                width: 120,
+                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                transition: "transform 120ms ease, box-shadow 120ms ease",
+                WebkitTapHighlightColor: "transparent",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.10)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)";
+              }}
+            >
+              <p style={{ fontSize: 22, margin: "0 0 6px", lineHeight: 1 }}>{wp.emoji}</p>
+              <p style={{
+                fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 700,
+                color: "#1A1A1A", margin: "0 0 4px", lineHeight: 1.2,
+              }}>
+                {wp.shortName}
+              </p>
+              <p style={{
+                fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 600,
+                color: wp.color, margin: 0,
+                letterSpacing: "0.03em",
+              }}>
+                Day {wp.day}
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* ── Activity grid ────────────────────────────────────────────── */}
       <div className="activity-grid" style={{

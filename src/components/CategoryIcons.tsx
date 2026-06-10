@@ -191,3 +191,22 @@ export function IllustrationRiddle() {
     </svg>
   );
 }
+
+export function IllustrationRhyme() {
+  return (
+    <svg viewBox="0 0 80 80" width="80" height="80" fill="none">
+      <rect width="80" height="80" rx="20" fill="#D97706"/>
+      {/* Mic body */}
+      <rect x="31" y="14" width="18" height="28" rx="9" fill="white" fillOpacity="0.95"/>
+      {/* Mic stand */}
+      <path d="M40 42 L40 62" stroke="white" strokeWidth="4" strokeLinecap="round"/>
+      <path d="M28 62 L52 62" stroke="white" strokeWidth="4" strokeLinecap="round"/>
+      {/* Sound waves */}
+      <path d="M22 32 C18 36 18 44 22 48" stroke="white" strokeWidth="3.5" strokeLinecap="round" fillOpacity="0" fill="none" opacity="0.7"/>
+      <path d="M58 32 C62 36 62 44 58 48" stroke="white" strokeWidth="3.5" strokeLinecap="round" fillOpacity="0" fill="none" opacity="0.7"/>
+      {/* Mic grill lines */}
+      <line x1="31" y1="28" x2="49" y2="28" stroke="#D97706" strokeWidth="1.5" strokeOpacity="0.3"/>
+      <line x1="31" y1="33" x2="49" y2="33" stroke="#D97706" strokeWidth="1.5" strokeOpacity="0.3"/>
+    </svg>
+  );
+}

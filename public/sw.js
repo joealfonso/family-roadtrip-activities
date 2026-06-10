@@ -1,15 +1,23 @@
-// Banff Road Trip — Service Worker v7
+// Banff Road Trip — Service Worker v8
 // Offline-capable PWA strategy:
 //   • /_next/static/ → cache-first (content-hashed filenames, safe forever)
 //   • Pages (/, /talk, etc.) → network-first, fall back to cache
 //   • Images / manifest → cache-first
 // On every SW update ALL old caches are wiped so stale JS never accumulates.
 
-const CACHE        = "banff-pages-v7";
-const STATIC_CACHE = "banff-static-v7";
+const CACHE        = "banff-pages-v8";
+const STATIC_CACHE = "banff-static-v8";
 
 // Pages to pre-cache during install so the app works offline immediately
-const PAGES = ["/", "/talk", "/fact", "/truefalse", "/quiz", "/game", "/riddle"];
+const PAGES = [
+  "/", "/talk", "/fact", "/truefalse", "/quiz", "/game", "/riddle", "/rhyme",
+  "/nearby",
+  "/waypoint/revelstoke", "/waypoint/glaciernp", "/waypoint/yoho",
+  "/waypoint/canmore", "/waypoint/johnstoncanyon", "/waypoint/lakelouise",
+  "/waypoint/morainelake", "/waypoint/peytolake", "/waypoint/columbiaicefield",
+  "/waypoint/grassi", "/waypoint/drumheller", "/waypoint/radium",
+  "/waypoint/penticton",
+];
 
 // ── Install: pre-cache all pages ─────────────────────────────────────────────
 self.addEventListener("install", (event) => {
