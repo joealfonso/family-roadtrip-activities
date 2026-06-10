@@ -60,7 +60,7 @@ function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
     }}>
       {/* Top row: language badge + Say it */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <span style={{
+        <span suppressHydrationWarning style={{
           fontFamily: "var(--font-sans)",
           fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
           textTransform: "uppercase",
@@ -92,7 +92,7 @@ function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
 
       {/* The word */}
       <div style={{ textAlign: "center" }}>
-        <p style={{
+        <p suppressHydrationWarning style={{
           fontFamily: "var(--font-display)",
           fontSize: "clamp(56px, 14vw, 88px)",
           fontWeight: 900,
@@ -103,7 +103,7 @@ function WordCard({ greeting }: { greeting: typeof GREETINGS[number] }) {
         }}>
           {greeting.word}
         </p>
-        <p style={{
+        <p suppressHydrationWarning style={{
           fontFamily: "var(--font-sans)",
           fontSize: 14, fontStyle: "italic",
           color: "rgba(255,255,255,0.58)",
@@ -237,7 +237,7 @@ function ActivityCard({
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const router = useRouter();
-  const [greeting,      setGreeting]      = useState<typeof GREETINGS[number] | null>(null);
+  const [greeting,      setGreeting]      = useState(GREETINGS[0]);
   const [settings,      setSettings]      = useState<AppSettings>({ soundEnabled: true, banffMode: false, gpsMode: false });
   const [arrivalISO,    setArrivalISO]    = useState<string | null>(null);
   const [showSettings,  setShowSettings]  = useState(false);
@@ -303,8 +303,7 @@ return (
       />
 
       {/* ── Word of the Day ──────────────────────────────────────────── */}
-      {greeting && <WordCard greeting={greeting} />}
-      {!greeting && <div style={{ height: 24 }} />}
+      <WordCard greeting={greeting} />
 
       <div style={{ height: 48 }} />
 
