@@ -188,12 +188,14 @@ const FLAT_ICONS: Record<ActivityType, (color: string) => React.ReactNode> = {
 // ── Activity card ─────────────────────────────────────────────────────────────
 function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => void }) {
   const meta = CATEGORY_META[type];
+  const [hovered, setHovered] = useState(false);
   return (
     <button
       onClick={onSelect}
-      className="activity-card"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: "none",
+        background: hovered ? `${meta.color}12` : "none",
         border: "none",
         borderBottom: "1px solid rgba(0,0,0,0.06)",
         borderRight: "1px solid rgba(0,0,0,0.06)",
@@ -201,6 +203,7 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
         display: "flex", flexDirection: "column", gap: 10,
         textAlign: "left", cursor: "pointer", width: "100%",
         WebkitTapHighlightColor: "transparent",
+        transition: "background 140ms ease",
       }}
     >
       {FLAT_ICONS[type](meta.color)}
