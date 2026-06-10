@@ -83,7 +83,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
   const nextType = ALL_TYPES[(allIdx + 1) % ALL_TYPES.length];
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#F6F3EE", paddingBottom: 80 }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#F6F3EE", paddingBottom: type === "game" ? 80 : 0 }}>
 
       {/* ── Sticky top bar ─────────────────────────────────────────────── */}
       <header style={{
@@ -98,7 +98,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
             fontFamily: "var(--font-sans, sans-serif)", fontSize: 14, fontWeight: 600,
             color: "rgba(255,255,255,0.85)", background: "none", border: "none",
             cursor: "pointer", padding: "8px 0",
-            display: "flex", alignItems: "center", gap: 4, minWidth: 60,
+            display: "flex", alignItems: "center", gap: 4,
           }}
         >
           ← Home
@@ -123,17 +123,8 @@ export default function CategoryPage({ params }: { params: { category: string } 
           </p>
         </div>
 
-        <button
-          onClick={() => setNavOpen(true)}
-          style={{
-            fontFamily: "var(--font-sans, sans-serif)", fontSize: 13, fontWeight: 600,
-            color: "rgba(255,255,255,0.9)", background: "rgba(255,255,255,0.18)",
-            border: "none", borderRadius: 8, cursor: "pointer",
-            padding: "6px 12px", minWidth: 60, textAlign: "right",
-          }}
-        >
-          Switch ↗
-        </button>
+        {/* Spacer to keep title centred */}
+        <div style={{ width: 60 }} />
       </header>
 
       {/* ── Activity card ──────────────────────────────────────────────── */}
@@ -155,47 +146,53 @@ export default function CategoryPage({ params }: { params: { category: string } 
         )}
       </main>
 
-      {/* ── Fixed bottom nav ───────────────────────────────────────────── */}
-      <nav style={{
-        position: "fixed", bottom: 0, left: 0, right: 0,
-        display: "flex", alignItems: "stretch",
-        borderTop: "1px solid #E8E8E8", backgroundColor: "#fff",
-        zIndex: 20, height: 56,
-      }}>
-        <button
-          onClick={() => router.push(`/${TYPE_TO_SLUG[prevType]}${banffMode ? "?banff=1" : ""}`)}
-          style={{
-            flex: 1, padding: "0 16px",
-            fontFamily: "var(--font-sans, sans-serif)", fontSize: 13, fontWeight: 600,
-            color: CATEGORY_META[prevType].color, background: "none", border: "none",
-            borderRight: "1px solid #E8E8E8", cursor: "pointer", textAlign: "left",
-            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          }}
-        >
-          ← {CATEGORY_META[prevType].label}
-        </button>
-        <button
-          onClick={() => setNavOpen(true)}
-          style={{
-            width: 56, flexShrink: 0, fontSize: 20, color: "#bbb",
-            background: "none", border: "none", borderRight: "1px solid #E8E8E8", cursor: "pointer",
-          }}
-        >
-          ⋯
-        </button>
-        <button
-          onClick={() => router.push(`/${TYPE_TO_SLUG[nextType]}${banffMode ? "?banff=1" : ""}`)}
-          style={{
-            flex: 1, padding: "0 16px",
-            fontFamily: "var(--font-sans, sans-serif)", fontSize: 13, fontWeight: 600,
-            color: CATEGORY_META[nextType].color, background: "none", border: "none",
-            cursor: "pointer", textAlign: "right",
-            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          }}
-        >
-          {CATEGORY_META[nextType].label} →
-        </button>
-      </nav>
+      {/* ── Game switcher — fixed bottom bar, only on /game ────────────── */}
+      {type === "game" && (
+        <nav style={{
+          position: "fixed", bottom: 0, left: 0, right: 0,
+          backgroundColor: "#fff",
+          borderTop: "1px solid #E8E8E8",
+          zIndex: 20, height: 68,
+          display: "flex", alignItems: "center",
+          padding: "0 16px", gap: 10,
+        }}>
+          {/* Tic Tac Toe — active */}
+          <div style={{
+            flex: 1, height: 48,
+            background: `${meta.color}18`,
+            border: `2px solid ${meta.color}50`,
+            borderRadius: 12,
+            display: "flex", alignItems: "center", gap: 10, padding: "0 14px",
+          }}>
+            <span style={{ fontSize: 18 }}>🎮</span>
+            <div>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: meta.color, margin: 0 }}>Tic Tac Toe</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "#bbb", margin: 0 }}>Playing now</p>
+            </div>
+          </div>
+
+          {/* Color Spinner — tap to switch */}
+          <button
+            onClick={() => router.push("/spinner")}
+            style={{
+              flex: 1, height: 48,
+              background: "rgba(0,0,0,0.03)",
+              border: "2px solid rgba(0,0,0,0.07)",
+              borderRadius: 12, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 10, padding: "0 14px",
+              transition: "background 140ms ease, border-color 140ms ease",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(217,119,6,0.08)"; e.currentTarget.style.borderColor = "rgba(217,119,6,0.35)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.03)";      e.currentTarget.style.borderColor = "rgba(0,0,0,0.07)"; }}
+          >
+            <span style={{ fontSize: 18 }}>🎨</span>
+            <div style={{ textAlign: "left" }}>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: "#D97706", margin: 0 }}>Color Spinner</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "#bbb", margin: 0 }}>Tap to play →</p>
+            </div>
+          </button>
+        </nav>
+      )}
 
       {navOpen && <CategoryNav currentType={type} onClose={() => setNavOpen(false)} />}
     </div>
