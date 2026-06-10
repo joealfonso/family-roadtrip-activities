@@ -93,12 +93,12 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
           aria-label="Next language"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+            fontSize: 13, fontWeight: 700, letterSpacing: "0.08em",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.7)",
             background: "rgba(255,255,255,0.12)",
             border: "1px solid rgba(255,255,255,0.18)",
-            borderRadius: 20, padding: "4px 12px",
+            borderRadius: 20, padding: "6px 16px",
             cursor: "pointer",
             transition: "background 140ms ease",
           }}
@@ -118,8 +118,8 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
             borderRadius: 20,
             color: "rgba(255,255,255,0.9)",
             fontFamily: "var(--font-sans)",
-            fontSize: 12, fontWeight: 600,
-            padding: "5px 14px", cursor: "pointer",
+            fontSize: 14, fontWeight: 600,
+            padding: "7px 18px", cursor: "pointer",
             display: "flex", alignItems: "center", gap: 5,
           }}
         >
@@ -131,7 +131,7 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
       <div style={{ textAlign: "center" }}>
         <p suppressHydrationWarning style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(56px, 14vw, 88px)",
+          fontSize: "clamp(72px, 18vw, 120px)",
           fontWeight: 900,
           color: "#fff",
           margin: 0, lineHeight: 1,
@@ -142,9 +142,9 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
         </p>
         <p suppressHydrationWarning style={{
           fontFamily: "var(--font-sans)",
-          fontSize: 14, fontStyle: "italic",
+          fontSize: 17, fontStyle: "italic",
           color: "rgba(255,255,255,0.58)",
-          margin: "10px 0 0", letterSpacing: "0.02em",
+          margin: "14px 0 0", letterSpacing: "0.02em",
         }}>
           / {greeting.phonetic} /
         </p>
@@ -178,33 +178,33 @@ function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; o
 // ── Flat icons ────────────────────────────────────────────────────────────────
 const FLAT_ICONS: Record<ActivityType, (color: string) => React.ReactNode> = {
   conversation: (c) => (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
       <path d="M4 6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H14l-5 4v-4H6a2 2 0 0 1-2-2V6Z" stroke={c} strokeWidth="2" strokeLinejoin="round"/>
       <path d="M10 22v2a2 2 0 0 0 2 2h12l5 4v-4h1a2 2 0 0 0 2-2v-8" stroke={c} strokeWidth="2" strokeLinecap="round"/>
     </svg>
   ),
   fact: (c) => (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
       <path d="M18 4C12.477 4 8 8.477 8 14c0 3.72 1.98 6.98 4.95 8.78V26h10v-3.22A10 10 0 0 0 28 14c0-5.523-4.477-10-10-10Z" stroke={c} strokeWidth="2" strokeLinejoin="round"/>
       <path d="M13 26h10M14 30h8" stroke={c} strokeWidth="2" strokeLinecap="round"/>
       <path d="M15 14h.01M18 11v6M21 14h.01" stroke={c} strokeWidth="2" strokeLinecap="round"/>
     </svg>
   ),
   trueFalse: (c) => (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
       <polyline points="5,19 11,26 21,10" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
       <line x1="25" y1="10" x2="33" y2="26" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
       <line x1="33" y1="10" x2="25" y2="26" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
   ),
   quiz: (c) => (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
       <path d="M13 13a5 5 0 0 1 9.9 1c0 3-4.9 4-4.9 7" stroke={c} strokeWidth="2.2" strokeLinecap="round"/>
       <circle cx="18" cy="27" r="1.5" fill={c}/>
     </svg>
   ),
   game: (c) => (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
       <rect x="4" y="12" width="28" height="16" rx="8" stroke={c} strokeWidth="2"/>
       <line x1="11" y1="17" x2="11" y2="23" stroke={c} strokeWidth="2" strokeLinecap="round"/>
       <line x1="8" y1="20" x2="14" y2="20" stroke={c} strokeWidth="2" strokeLinecap="round"/>
@@ -215,7 +215,7 @@ const FLAT_ICONS: Record<ActivityType, (color: string) => React.ReactNode> = {
     </svg>
   ),
   riddle: (c) => (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
       <circle cx="16" cy="16" r="9" stroke={c} strokeWidth="2"/>
       <line x1="22.5" y1="22.5" x2="31" y2="31" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
@@ -246,7 +246,7 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
       <div>
         <p style={{
           fontFamily: "var(--font-display)",
-          fontSize: 15, fontWeight: 700,
+          fontSize: 18, fontWeight: 700,
           color: "#1A1A1A",
           margin: 0, lineHeight: 1.2,
           letterSpacing: "-0.01em",
@@ -255,9 +255,9 @@ function ActivityCard({ type, onSelect }: { type: ActivityType; onSelect: () => 
         </p>
         <p style={{
           fontFamily: "var(--font-sans)",
-          fontSize: 12, fontWeight: 500,
+          fontSize: 14, fontWeight: 500,
           color: "rgba(0,0,0,0.42)",
-          margin: "3px 0 0", lineHeight: 1.4,
+          margin: "5px 0 0", lineHeight: 1.4,
         }}>
           {meta.tagline}
         </p>
@@ -290,17 +290,17 @@ return (
       {/* ── Header ───────────────────────────────────────────────────── */}
       <header style={{
         backgroundColor: PARCHMENT,
-        padding: "0 20px",
-        height: 56,
+        padding: "0 24px",
+        height: 64,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         position: "sticky", top: 0, zIndex: 20,
         borderBottom: "1px solid rgba(0,0,0,0.06)",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }} suppressHydrationWarning>
-          <span style={{ fontSize: 18 }}>🏔</span>
+          <span style={{ fontSize: 22 }}>🏔</span>
           <span style={{
             fontFamily: "var(--font-display)",
-            fontSize: 16, fontWeight: 700,
+            fontSize: 18, fontWeight: 700,
             color: PINE, letterSpacing: "-0.02em",
           }}>
             Banff Road Trip
@@ -360,8 +360,8 @@ return (
 }
 
 const iconBtnStyle: React.CSSProperties = {
-  width: 36, height: 36, borderRadius: 10,
+  width: 42, height: 42, borderRadius: 12,
   border: "none", background: "rgba(0,0,0,0.06)",
-  cursor: "pointer", fontSize: 16,
+  cursor: "pointer", fontSize: 18,
   display: "flex", alignItems: "center", justifyContent: "center",
 };

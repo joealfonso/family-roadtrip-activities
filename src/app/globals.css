@@ -80,29 +80,33 @@ body {
 }
 
 .activity-card {
-  padding: 20px 16px;
+  padding: 28px 24px;
 }
 
+/* Mobile: single column stack */
 .activity-grid {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 540px) {
   .hero-card {
-    padding: 48px 40px 120px;
+    padding: 56px 48px 140px;
   }
   .activity-card {
-    padding: 28px 24px;
+    padding: 36px 32px;
+  }
+  .activity-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-card {
-    padding: 72px 56px 160px;
+    padding: 88px 72px 180px;
   }
   .activity-card {
-    padding: 40px 32px;
-    gap: 16px;
+    padding: 52px 44px;
+    gap: 18px;
   }
   .activity-grid {
     grid-template-columns: 1fr 1fr 1fr;
