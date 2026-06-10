@@ -1,8 +1,8 @@
 // Banff Road Trip — Service Worker
 // Strategy: cache-first for static assets, network-first for pages (fallback to cache)
 
-const CACHE  = "banff-trip-v3";
-const STATIC = "banff-static-v3";
+const CACHE  = "banff-trip-v5";
+const STATIC = "banff-static-v5";
 
 // Pre-cache these on install so the app works immediately offline
 const PRECACHE = [
