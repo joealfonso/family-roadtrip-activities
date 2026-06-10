@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ActivityType } from "@/lib/activities";
-import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
+import type { ActivityType } from "@/lib/activities";
+import { CATEGORY_META } from "@/lib/categories";
 import { getSettings, AppSettings } from "@/lib/store";
 import SettingsPanel from "@/components/SettingsPanel";
 import TripLogPanel  from "@/components/TripLogPanel";
