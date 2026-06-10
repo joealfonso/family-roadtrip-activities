@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <script
           dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(function(reg){reg.update();if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});}reg.addEventListener('updatefound',function(){var sw=reg.installing;sw&&sw.addEventListener('statechange',function(){if(sw.state==='installed'&&reg.active){sw.postMessage({type:'SKIP_WAITING'});}});});}).catch(console.error);});}`
+            __html: `(function(){if(!('serviceWorker'in navigator))return;var reloading=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!reloading){reloading=true;window.location.reload();}});window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(function(reg){reg.update();function trySkip(sw){if(!sw)return;sw.addEventListener('statechange',function(){if(sw.state==='installed')sw.postMessage({type:'SKIP_WAITING'});});}if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});reg.addEventListener('updatefound',function(){trySkip(reg.installing);});}).catch(console.error);});})();`
           }}
         />
       </body>

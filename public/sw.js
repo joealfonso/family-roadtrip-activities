@@ -9,6 +9,11 @@ const STATIC = "banff-static-v6";
 // Delete ALL old caches immediately on activate
 self.addEventListener("install", () => self.skipWaiting());
 
+// Also skip waiting if the page asks us to (via postMessage)
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
+
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
