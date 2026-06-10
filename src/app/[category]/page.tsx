@@ -7,6 +7,7 @@ import { SLUG_TO_TYPE, CATEGORY_META, TYPE_TO_SLUG, ALL_TYPES } from "@/lib/cate
 import { getSettings, logActivity } from "@/lib/store";
 import ActivityDisplay from "@/components/ActivityDisplay";
 import CategoryNav from "@/components/CategoryNav";
+import TicTacToe from "@/components/TicTacToe";
 
 // Activity IDs that are Banff-specific (vs generic road trip)
 const BANFF_IDS = new Set([
@@ -137,7 +138,9 @@ export default function CategoryPage({ params }: { params: { category: string } 
 
       {/* ── Activity card ──────────────────────────────────────────────── */}
       <main style={{ width: "100%", maxWidth: 680, margin: "0 auto", padding: "28px 16px 24px", boxSizing: "border-box" }}>
-        {current ? (
+        {type === "game" ? (
+          <TicTacToe />
+        ) : current ? (
           <ActivityDisplay
             key={`${current.id}-${cardKey}`}
             activity={current}
