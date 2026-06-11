@@ -5,9 +5,116 @@ import { useState, useEffect } from "react";
 import type { ActivityType } from "@/lib/activities";
 import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
 import { getSettings, AppSettings } from "@/lib/store";
-import { WAYPOINTS } from "@/lib/waypoints";
+import { WAYPOINTS, Waypoint } from "@/lib/waypoints";
 import SettingsPanel from "@/components/SettingsPanel";
 import TripLogPanel  from "@/components/TripLogPanel";
+
+// ── Trip day logic ────────────────────────────────────────────────────────────
+const TRIP_START_MS = new Date("2026-06-10T00:00:00").getTime();
+const TRIP_DAYS     = 11;
+
+function getTripDay(): number {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return Math.floor((today.getTime() - TRIP_START_MS) / 86_400_000) + 1;
+}
+
+// ── Day banner ────────────────────────────────────────────────────────────────
+function DayBanner({ onNavigate }: { onNavigate: (id: string) => void }) {
+  const [day, setDay] = useState<number | null>(null);
+
+  useEffect(() => { setDay(getTripDay()); }, []);
+  if (day === null) return null; // avoid hydration mismatch
+
+  // Before trip
+  if (day < 1) {
+    const daysUntil = 1 - day;
+    return (
+      <div style={{
+        background: "#F0F7FF", borderBottom: "1px solid rgba(0,0,0,0.06)",
+        padding: "12px 20px",
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        <span style={{ fontSize: 22 }}>🚗</span>
+        <div>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 800, color: PINE, margin: 0, letterSpacing: "-0.01em" }}>
+            Trip starts in {daysUntil} day{daysUntil !== 1 ? "s" : ""}
+          </p>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "#888", margin: 0 }}>
+            Jun 10 · Seattle → Revelstoke
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // After trip
+  if (day > TRIP_DAYS) {
+    return (
+      <div style={{
+        background: "#F0FFF5", borderBottom: "1px solid rgba(0,0,0,0.06)",
+        padding: "12px 20px",
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        <span style={{ fontSize: 22 }}>🏆</span>
+        <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 800, color: "#1A6B49", margin: 0 }}>
+          Trip complete! What a journey 🎉
+        </p>
+      </div>
+    );
+  }
+
+  // During trip — find waypoints for today
+  const todayWps = WAYPOINTS.filter(w => w.day === day);
+  const primary: Waypoint | undefined = todayWps[0];
+  if (!primary) return null;
+
+  return (
+    <button
+      onClick={() => onNavigate(primary.id)}
+      style={{
+        width: "100%", textAlign: "left",
+        background: `linear-gradient(105deg, ${primary.color}22 0%, ${primary.color}08 100%)`,
+        borderBottom: `1px solid ${primary.color}30`,
+        borderTop: "none", borderLeft: "none", borderRight: "none",
+        padding: "12px 20px", cursor: "pointer",
+        display: "flex", alignItems: "center", gap: 12,
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      {/* Day pill */}
+      <div style={{
+        flexShrink: 0,
+        background: primary.color, color: "#fff",
+        borderRadius: 10, padding: "4px 10px",
+        display: "flex", flexDirection: "column", alignItems: "center",
+      }}>
+        <span style={{ fontFamily: "var(--font-sans)", fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.85 }}>DAY</span>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 900, lineHeight: 1 }}>{day}</span>
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 2 }}>
+          <span style={{ fontSize: 16 }}>{primary.emoji}</span>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 800, color: primary.color, letterSpacing: "-0.01em" }}>
+            {primary.name}
+          </span>
+        </div>
+        <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "#888", margin: 0,
+          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {primary.tagline}
+          {todayWps.length > 1 && (
+            <span style={{ color: primary.color, fontWeight: 600 }}>
+              {" "}+{todayWps.length - 1} more stop{todayWps.length > 2 ? "s" : ""}
+            </span>
+          )}
+        </p>
+      </div>
+
+      <span style={{ fontFamily: "var(--font-sans)", fontSize: 18, color: primary.color, opacity: 0.5, flexShrink: 0 }}>›</span>
+    </button>
+  );
+}
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const PINE      = "#1C4B3A";
@@ -300,6 +407,9 @@ return (
 
       {/* ── Word of the road ─────────────────────────────────────────── */}
       <WordStrip greeting={greeting} onCycle={cycleGreeting} />
+
+      {/* ── Today banner ─────────────────────────────────────────────── */}
+      <DayBanner onNavigate={(id) => router.push(`/waypoint/${id}`)} />
 
       {/* ── Route Strip ──────────────────────────────────────────────── */}
       <div style={{ padding: "20px 0 4px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
