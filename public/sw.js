@@ -5,12 +5,12 @@
 //   • Images / manifest → cache-first
 // On every SW update ALL old caches are wiped so stale JS never accumulates.
 
-const CACHE        = "banff-pages-v9";
-const STATIC_CACHE = "banff-static-v9";
+const CACHE        = "banff-pages-v10";
+const STATIC_CACHE = "banff-static-v10";
 
 // Pages to pre-cache during install so the app works offline immediately
 const PAGES = [
-  "/", "/talk", "/fact", "/truefalse", "/quiz", "/game", "/riddle", "/rhyme", "/spinner", "/dragon",
+  "/", "/talk", "/fact", "/truefalse", "/quiz", "/game", "/riddle", "/rhyme", "/spinner", "/dragon", "/saved",
   "/nearby",
   "/waypoint/revelstoke", "/waypoint/glaciernp", "/waypoint/yoho",
   "/waypoint/canmore", "/waypoint/johnstoncanyon", "/waypoint/lakelouise",

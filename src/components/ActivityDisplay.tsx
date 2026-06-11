@@ -1,21 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Activity } from "@/lib/activities";
 import { playCorrect, playWrong, playReveal, playNext } from "@/lib/sounds";
+import { isSaved, toggleSaved } from "@/lib/store";
 
 interface Props {
   activity: Activity;
   onNext: () => void;
   accentColor: string;
   soundEnabled?: boolean;
+  remaining?: number; // how many unseen activities are left in this category
 }
 
-export default function ActivityDisplay({ activity, onNext, accentColor, soundEnabled = true }: Props) {
+export default function ActivityDisplay({ activity, onNext, accentColor, soundEnabled = true, remaining }: Props) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [tfAnswer, setTfAnswer]             = useState<boolean | null>(null);
   const [revealed, setRevealed]             = useState(false);
+  const [saved, setSaved]                   = useState(false);
+
+  // Read saved state from localStorage on mount / when activity changes
+  useEffect(() => { setSaved(isSaved(activity.id)); }, [activity.id]);
 
   const sfx = (fn: () => void) => { if (soundEnabled) fn(); };
+
+  const handleSave = () => {
+    const nowSaved = toggleSaved({
+      id: activity.id, type: activity.type,
+      title: activity.title, emoji: activity.emoji,
+      content: activity.content, answer: activity.answer,
+      hint: activity.hint, options: activity.options,
+    });
+    setSaved(nowSaved);
+  };
 
   const quizCorrect = selectedAnswer === activity.answer;
   const tfCorrect   =
@@ -40,7 +56,7 @@ export default function ActivityDisplay({ activity, onNext, accentColor, soundEn
 
       <div style={{ padding: "28px 24px 24px" }}>
 
-        {/* Emoji + title */}
+        {/* Emoji + title + save button */}
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 20 }}>
           <span style={{ fontSize: 36, lineHeight: 1, flexShrink: 0 }}>{activity.emoji}</span>
           <h2 style={{
@@ -51,9 +67,27 @@ export default function ActivityDisplay({ activity, onNext, accentColor, soundEn
             lineHeight: 1.2,
             color: "#111",
             margin: 0,
+            flex: 1,
           }}>
             {activity.title}
           </h2>
+          <button
+            onClick={handleSave}
+            aria-label={saved ? "Remove from saved" : "Save this activity"}
+            style={{
+              flexShrink: 0,
+              width: 36, height: 36,
+              borderRadius: 10,
+              border: `1.5px solid ${saved ? accentColor : "rgba(0,0,0,0.1)"}`,
+              background: saved ? `${accentColor}15` : "transparent",
+              cursor: "pointer", fontSize: 17,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "all 160ms ease",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            {saved ? "🔖" : "🗒️"}
+          </button>
         </div>
 
         {/* Body text */}
@@ -233,6 +267,26 @@ export default function ActivityDisplay({ activity, onNext, accentColor, soundEn
         >
           Next →
         </button>
+
+        {/* Remaining count */}
+        {remaining !== undefined && remaining > 0 && (
+          <p style={{
+            fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 500,
+            color: "rgba(0,0,0,0.3)", textAlign: "center",
+            margin: "10px 0 0",
+          }}>
+            {remaining} more in this category
+          </p>
+        )}
+        {remaining === 0 && (
+          <p style={{
+            fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 600,
+            color: accentColor, textAlign: "center",
+            margin: "10px 0 0",
+          }}>
+            🎉 You&apos;ve seen them all! Starting over…
+          </p>
+        )}
       </div>
     </div>
   );

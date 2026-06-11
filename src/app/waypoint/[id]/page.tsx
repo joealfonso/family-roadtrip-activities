@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { WAYPOINTS, getWaypointById, TYPE_BADGE, NearbyItem } from "@/lib/waypoints";
+import { ALL_TYPES, CATEGORY_META, TYPE_TO_SLUG } from "@/lib/categories";
 
 const DAY_COLORS = ["", "#1C4B3A", "#2E6DA4", "#5C6B3A"];
 
@@ -217,6 +218,63 @@ export default function WaypointPage({ params }: { params: { id: string } }) {
           {waypoint.nearby.map((item, i) => (
             <NearbyCard key={i} item={item} />
           ))}
+        </div>
+
+        {/* ── Activities ────────────────────────────────────────────── */}
+        <div style={{ marginTop: 32 }}>
+          <h2 style={{
+            fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 800,
+            color: "#1A1A1A", margin: "0 0 4px", letterSpacing: "-0.02em",
+          }}>
+            Activities
+          </h2>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "#999", margin: "0 0 14px" }}>
+            Play a round while you&apos;re here
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {ALL_TYPES.filter(t => t !== "game").map(t => {
+              const m = CATEGORY_META[t];
+              return (
+                <button
+                  key={t}
+                  onClick={() => router.push(`/${TYPE_TO_SLUG[t]}`)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "9px 14px",
+                    background: `${m.color}14`,
+                    border: `1.5px solid ${m.color}30`,
+                    borderRadius: 24, cursor: "pointer",
+                    transition: "all 140ms ease",
+                    WebkitTapHighlightColor: "transparent",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = `${m.color}28`; e.currentTarget.style.borderColor = `${m.color}60`; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = `${m.color}14`; e.currentTarget.style.borderColor = `${m.color}30`; }}
+                >
+                  <span style={{ fontSize: 16 }}>{m.emoji}</span>
+                  <span style={{ fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, color: m.color }}>
+                    {m.label}
+                  </span>
+                </button>
+              );
+            })}
+            {/* Games chip */}
+            <button
+              onClick={() => router.push("/game")}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "9px 14px",
+                background: `${CATEGORY_META.game.color}14`,
+                border: `1.5px solid ${CATEGORY_META.game.color}30`,
+                borderRadius: 24, cursor: "pointer",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <span style={{ fontSize: 16 }}>🎮</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, color: CATEGORY_META.game.color }}>
+                Games
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* ── Next/Prev waypoints ────────────────────────────────────── */}

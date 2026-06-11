@@ -66,6 +66,46 @@ export function formatCountdown(arrivalISO: string): string {
   return "less than a minute";
 }
 
+// ── Saved activities ─────────────────────────────────────────────────────────
+
+export interface SavedActivity {
+  id: string;
+  type: string;
+  title: string;
+  emoji: string;
+  content: string;
+  answer?: string;
+  hint?: string;
+  options?: string[];
+  savedAt: number;
+}
+
+export function getSaved(): SavedActivity[] {
+  return getLS<SavedActivity[]>("trip_saved", []);
+}
+
+export function isSaved(id: string): boolean {
+  return getSaved().some(s => s.id === id);
+}
+
+export function toggleSaved(activity: Omit<SavedActivity, "savedAt">): boolean {
+  const saved = getSaved();
+  const idx = saved.findIndex(s => s.id === activity.id);
+  if (idx >= 0) {
+    saved.splice(idx, 1);
+    setLS("trip_saved", saved);
+    return false; // removed
+  }
+  saved.push({ ...activity, savedAt: Date.now() });
+  setLS("trip_saved", saved);
+  return true; // added
+}
+
+export function unsaveActivity(id: string): void {
+  const saved = getSaved().filter(s => s.id !== id);
+  setLS("trip_saved", saved);
+}
+
 // ── Trip log ──────────────────────────────────────────────────────────────────
 
 export interface TripEntry {

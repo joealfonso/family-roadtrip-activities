@@ -76,101 +76,63 @@ function sayWord(word: string, lang: string) {
   window.speechSynthesis.speak(utt);
 }
 
-// ── Mountain hero card ────────────────────────────────────────────────────────
-function WordCard({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; onCycle: () => void }) {
+// ── Compact word-of-the-day strip ─────────────────────────────────────────────
+function WordStrip({ greeting, onCycle }: { greeting: typeof GREETINGS[number]; onCycle: () => void }) {
   return (
-    <div className="hero-card" style={{
-      position: "relative",
-      overflow: "hidden",
-      borderRadius: 0,
-      background: `linear-gradient(175deg, ${GLACIER} 0%, ${PINE} 55%, ${PINE_DARK} 100%)`,
-      margin: 0,
+    <div style={{
+      background: `linear-gradient(105deg, ${PINE} 0%, ${GLACIER} 100%)`,
+      padding: "14px 20px",
+      display: "flex", alignItems: "center", gap: 12,
     }}>
-      {/* Top row: language badge + Say it */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+      {/* Word + phonetic */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", margin: "0 0 2px" }}>
+          Word of the road
+        </p>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span suppressHydrationWarning style={{
+            fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 900,
+            color: "#fff", letterSpacing: "-0.02em", lineHeight: 1,
+          }}>
+            {greeting.word}
+          </span>
+          <span suppressHydrationWarning style={{
+            fontFamily: "var(--font-sans)", fontSize: 12, fontStyle: "italic",
+            color: "rgba(255,255,255,0.5)",
+          }}>
+            / {greeting.phonetic} /
+          </span>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+        <button
+          onClick={() => sayWord(greeting.word, greeting.lang)}
+          aria-label={`Pronounce ${greeting.word}`}
+          style={{
+            background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.22)",
+            borderRadius: 20, color: "rgba(255,255,255,0.9)",
+            fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600,
+            padding: "6px 12px", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 4,
+          }}
+        >
+          🔊
+        </button>
         <button
           onClick={onCycle}
           suppressHydrationWarning
           aria-label="Next language"
           style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: 13, fontWeight: 700, letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "rgba(255,255,255,0.7)",
-            background: "rgba(255,255,255,0.12)",
-            border: "1px solid rgba(255,255,255,0.18)",
-            borderRadius: 20, padding: "6px 16px",
-            cursor: "pointer",
-            transition: "background 140ms ease",
+            background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)",
+            borderRadius: 20, color: "rgba(255,255,255,0.65)",
+            fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700,
+            padding: "6px 10px", cursor: "pointer",
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.22)")}
-          onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}
         >
           {greeting.lang} ↻
         </button>
-
-        <button
-          onClick={() => sayWord(greeting.word, greeting.lang)}
-          aria-label={`Pronounce ${greeting.word}`}
-          className="say-btn"
-          style={{
-            background: "rgba(255,255,255,0.14)",
-            border: "1px solid rgba(255,255,255,0.22)",
-            borderRadius: 20,
-            color: "rgba(255,255,255,0.9)",
-            fontFamily: "var(--font-sans)",
-            fontSize: 14, fontWeight: 600,
-            padding: "7px 18px", cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 5,
-          }}
-        >
-          <span>🔊</span> Say it
-        </button>
-      </div>
-
-      {/* The word */}
-      <div style={{ textAlign: "center" }}>
-        <p suppressHydrationWarning style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(56px, 14vw, 88px)",
-          fontWeight: 900,
-          color: "#fff",
-          margin: 0, lineHeight: 1,
-          letterSpacing: "-0.02em",
-          textShadow: "0 2px 20px rgba(0,0,0,0.25)",
-        }}>
-          {greeting.word}
-        </p>
-        <p suppressHydrationWarning style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 14, fontStyle: "italic",
-          color: "rgba(255,255,255,0.58)",
-          margin: "10px 0 0", letterSpacing: "0.02em",
-        }}>
-          / {greeting.phonetic} /
-        </p>
-      </div>
-
-      {/* Mountain silhouette layers */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 90 }} aria-hidden>
-        <svg viewBox="0 0 200 45" preserveAspectRatio="none" width="100%" height="100%">
-          {/* Distant range — lighter */}
-          <path
-            d="M0,45 L0,30 L12,20 L22,27 L35,12 L48,23 L58,17 L70,22 L82,10 L95,20 L108,14 L120,22 L132,8 L145,18 L158,13 L170,20 L182,15 L200,22 L200,45 Z"
-            fill="rgba(255,255,255,0.10)"
-          />
-          {/* Mid range */}
-          <path
-            d="M0,45 L0,36 L18,26 L30,32 L44,20 L56,28 L68,22 L80,29 L95,18 L110,26 L124,20 L138,27 L152,16 L165,24 L178,19 L200,26 L200,45 Z"
-            fill="rgba(255,255,255,0.08)"
-          />
-          {/* Foreground ridge — darkest */}
-          <path
-            d="M0,45 L0,40 L20,34 L32,38 L46,28 L58,35 L72,30 L85,36 L100,25 L114,33 L128,27 L142,34 L156,29 L170,35 L184,30 L200,36 L200,45 Z"
-            fill={PINE_DARK}
-            fillOpacity="0.7"
-          />
-        </svg>
       </div>
     </div>
   );
@@ -327,6 +289,8 @@ return (
         </div>
 
         <div style={{ display: "flex", gap: 6 }}>
+          <button onClick={() => router.push("/saved")} aria-label="Saved activities"
+            className="icon-btn" style={iconBtnStyle}>🔖</button>
           <button onClick={() => setShowLog(true)} aria-label="Trip log"
             className="icon-btn" style={iconBtnStyle}>📓</button>
           <button onClick={() => setShowSettings(true)} aria-label="Settings"
@@ -334,8 +298,8 @@ return (
         </div>
       </header>
 
-      {/* ── Word of the Day ──────────────────────────────────────────── */}
-      <WordCard greeting={greeting} onCycle={cycleGreeting} />
+      {/* ── Word of the road ─────────────────────────────────────────── */}
+      <WordStrip greeting={greeting} onCycle={cycleGreeting} />
 
       {/* ── Route Strip ──────────────────────────────────────────────── */}
       <div style={{ padding: "20px 0 4px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>

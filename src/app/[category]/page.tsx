@@ -75,6 +75,11 @@ export default function CategoryPage({ params }: { params: { category: string } 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // How many unseen activities remain after current
+  const remaining = type
+    ? Math.max(0, getPool(banffMode).filter(a => !seenIds.includes(a.id) && a.id !== current?.id).length)
+    : 0;
+
   if (!type || !hydrated) return <div style={{ minHeight: "100vh", background: "#F6F3EE" }} />;
 
   const meta     = CATEGORY_META[type];
@@ -138,6 +143,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
             onNext={handleNext}
             accentColor={meta.color}
             soundEnabled={soundEnabled}
+            remaining={remaining}
           />
         ) : (
           <p style={{ textAlign: "center", color: "#aaa", paddingTop: 80, fontFamily: "var(--font-sans, sans-serif)" }}>

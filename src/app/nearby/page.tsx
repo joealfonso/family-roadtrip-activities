@@ -10,8 +10,10 @@ import {
   distanceKm,
   TYPE_BADGE,
 } from "@/lib/waypoints";
+import RouteMap from "@/components/RouteMap";
 
 type Status = "idle" | "locating" | "found" | "denied" | "error";
+type UserCoords = { lat: number; lng: number };
 
 function NearbyCard({ item }: { item: NearbyItem }) {
   const badge = TYPE_BADGE[item.type];
@@ -137,10 +139,11 @@ function WaypointPicker({
 
 export default function NearbyPage() {
   const router = useRouter();
-  const [status, setStatus]       = useState<Status>("idle");
-  const [waypoint, setWaypoint]   = useState<Waypoint | null>(null);
-  const [distKm, setDistKm]       = useState<number | null>(null);
-  const [manual, setManual]       = useState(false);
+  const [status, setStatus]           = useState<Status>("idle");
+  const [waypoint, setWaypoint]       = useState<Waypoint | null>(null);
+  const [distKm, setDistKm]           = useState<number | null>(null);
+  const [manual, setManual]           = useState(false);
+  const [userCoords, setUserCoords]   = useState<UserCoords | null>(null);
 
   const locate = () => {
     if (!navigator.geolocation) { setStatus("error"); return; }
@@ -149,6 +152,7 @@ export default function NearbyPage() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
+        setUserCoords({ lat, lng });
         const result = findNearestWaypoint({ lat, lng });
         setWaypoint(result.waypoint);
         setDistKm(result.distanceKm);
@@ -213,6 +217,14 @@ export default function NearbyPage() {
       </header>
 
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "24px 16px" }}>
+
+        {/* ── Route map — always visible ─────────────────────────────── */}
+        <div style={{ marginBottom: 20 }}>
+          <RouteMap
+            selectedId={waypoint?.id}
+            userCoords={userCoords ?? undefined}
+          />
+        </div>
 
         {/* ── Locating ───────────────────────────────────────────────── */}
         {status === "locating" && (
