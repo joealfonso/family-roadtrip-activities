@@ -3,27 +3,35 @@
 import { WAYPOINTS } from "@/lib/waypoints";
 
 interface RouteMapProps {
-  selectedId?: string;                      // highlighted waypoint (nearest / picked)
-  userCoords?: { lat: number; lng: number }; // raw GPS position
+  selectedId?: string;
+  userCoords?: { lat: number; lng: number };
 }
 
 // ── Projection ────────────────────────────────────────────────────────────────
-// Bounding box that comfortably contains the whole route
-const MIN_LNG = -120.6, MAX_LNG = -112.0;
+// Tight bounds around the actual stops (with a little padding)
+const MIN_LNG = -120.2, MAX_LNG = -112.2;
 const MIN_LAT =  49.0,  MAX_LAT =  52.7;
-const VW = 340, VH = 200; // SVG viewBox size
+const VW = 320, VH = 180;
 
 function project(lat: number, lng: number) {
   const x = ((lng - MIN_LNG) / (MAX_LNG - MIN_LNG)) * VW;
-  const y = ((MAX_LAT - lat) / (MAX_LAT - MIN_LAT)) * VH; // y inverted
+  const y = ((MAX_LAT - lat) / (MAX_LAT - MIN_LAT)) * VH;
   return { x, y };
 }
 
-export default function RouteMap({ selectedId, userCoords }: RouteMapProps) {
-  const pts = WAYPOINTS.map(wp => ({ ...project(wp.coords.lat, wp.coords.lng), wp }));
+// Slight jitter for waypoints that share coords (Grassi ≈ Canmore)
+const OFFSETS: Record<string, { dx: number; dy: number }> = {
+  grassi:            { dx:  6, dy:  8 },
+  johnstoncanyon:    { dx: -7, dy: -6 },
+  morainelake:       { dx:  8, dy:  6 },
+};
 
-  // Build polyline points string
-  const linePoints = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+export default function RouteMap({ selectedId, userCoords }: RouteMapProps) {
+  const pts = WAYPOINTS.map(wp => {
+    const off = OFFSETS[wp.id] ?? { dx: 0, dy: 0 };
+    const { x, y } = project(wp.coords.lat, wp.coords.lng);
+    return { x: x + off.dx, y: y + off.dy, wp };
+  });
 
   const userPt = userCoords ? project(userCoords.lat, userCoords.lng) : null;
 
@@ -36,64 +44,81 @@ export default function RouteMap({ selectedId, userCoords }: RouteMapProps) {
       boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
     }}>
       <svg
-        viewBox={`-8 -8 ${VW + 16} ${VH + 16}`}
+        viewBox={`-12 -12 ${VW + 24} ${VH + 24}`}
         width="100%"
         style={{ display: "block" }}
         aria-label="Route map"
       >
         {/* ── Background ── */}
-        <rect x={-8} y={-8} width={VW + 16} height={VH + 16} fill="#EDF4FA" />
+        <rect x={-12} y={-12} width={VW + 24} height={VH + 24} fill="#EDF4FA" />
 
-        {/* ── Route line (dashed, behind dots) ── */}
-        <polyline
-          points={linePoints}
-          fill="none"
-          stroke="#B0C8D8"
-          strokeWidth="2"
-          strokeLinejoin="round"
-          strokeDasharray="4 3"
-        />
+        {/* ── Subtle grid lines for orientation ── */}
+        {[0.25, 0.5, 0.75].map(t => (
+          <line key={`v${t}`}
+            x1={(t * VW).toFixed(0)} y1={-12} x2={(t * VW).toFixed(0)} y2={VH + 12}
+            stroke="rgba(255,255,255,0.6)" strokeWidth="1"
+          />
+        ))}
+        {[0.33, 0.67].map(t => (
+          <line key={`h${t}`}
+            x1={-12} y1={(t * VH).toFixed(0)} x2={VW + 12} y2={(t * VH).toFixed(0)}
+            stroke="rgba(255,255,255,0.6)" strokeWidth="1"
+          />
+        ))}
 
         {/* ── Waypoint dots ── */}
         {pts.map(({ x, y, wp }) => {
-          const isSelected = wp.id === selectedId;
+          const sel = wp.id === selectedId;
+          const cx = x.toFixed(1), cy = y.toFixed(1);
           return (
             <g key={wp.id}>
-              {/* Selection halo */}
-              {isSelected && (
-                <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="11" fill={wp.color} opacity="0.22" />
+              {/* Selection pulse ring */}
+              {sel && (
+                <circle cx={cx} cy={cy} r="14" fill={wp.color} opacity="0.18" />
               )}
-              {/* Dot */}
+
+              {/* Main dot */}
               <circle
-                cx={x.toFixed(1)}
-                cy={y.toFixed(1)}
-                r={isSelected ? 6 : 4}
-                fill={isSelected ? wp.color : "#fff"}
+                cx={cx} cy={cy}
+                r={sel ? 8 : 5}
+                fill={sel ? wp.color : "#fff"}
                 stroke={wp.color}
-                strokeWidth={isSelected ? 2 : 1.5}
+                strokeWidth={sel ? 0 : 2}
               />
-              {/* Emoji label for selected */}
-              {isSelected && (
+
+              {/* Day number inside unselected dots */}
+              {!sel && (
                 <text
-                  x={x.toFixed(1)}
-                  y={(y - 13).toFixed(1)}
-                  textAnchor="middle"
-                  fontSize="13"
-                  style={{ userSelect: "none" }}
+                  x={cx} y={(y + 0.5).toFixed(1)}
+                  textAnchor="middle" dominantBaseline="middle"
+                  fontSize="5" fontWeight="700"
+                  fill={wp.color}
+                  style={{ userSelect: "none", pointerEvents: "none" }}
+                >
+                  {wp.day}
+                </text>
+              )}
+
+              {/* Emoji above selected dot */}
+              {sel && (
+                <text
+                  x={cx} y={(y - 14).toFixed(1)}
+                  textAnchor="middle" dominantBaseline="auto"
+                  fontSize="14"
+                  style={{ userSelect: "none", pointerEvents: "none" }}
                 >
                   {wp.emoji}
                 </text>
               )}
-              {/* Name label for selected */}
-              {isSelected && (
+
+              {/* Name below selected dot */}
+              {sel && (
                 <text
-                  x={x.toFixed(1)}
-                  y={(y + 18).toFixed(1)}
-                  textAnchor="middle"
-                  fontSize="7.5"
-                  fontWeight="700"
+                  x={cx} y={(y + 20).toFixed(1)}
+                  textAnchor="middle" dominantBaseline="hanging"
+                  fontSize="7.5" fontWeight="800"
                   fill={wp.color}
-                  style={{ userSelect: "none" }}
+                  style={{ userSelect: "none", pointerEvents: "none" }}
                 >
                   {wp.shortName}
                 </text>
@@ -102,40 +127,46 @@ export default function RouteMap({ selectedId, userCoords }: RouteMapProps) {
           );
         })}
 
-        {/* ── User GPS position ── */}
+        {/* ── User GPS dot ── */}
         {userPt && (
           <g>
-            <circle cx={userPt.x.toFixed(1)} cy={userPt.y.toFixed(1)} r="9" fill="#1B72C0" opacity="0.18" />
-            <circle cx={userPt.x.toFixed(1)} cy={userPt.y.toFixed(1)} r="5" fill="#1B72C0" stroke="#fff" strokeWidth="1.5" />
+            <circle cx={userPt.x.toFixed(1)} cy={userPt.y.toFixed(1)} r="10" fill="#1B72C0" opacity="0.15" />
+            <circle cx={userPt.x.toFixed(1)} cy={userPt.y.toFixed(1)} r="5"  fill="#1B72C0" stroke="#fff" strokeWidth="1.5" />
           </g>
         )}
       </svg>
 
-      {/* Legend */}
+      {/* ── Legend bar ── */}
       <div style={{
         padding: "8px 14px",
         borderTop: "1px solid rgba(0,0,0,0.06)",
-        display: "flex", alignItems: "center", gap: 14,
+        background: "#fff",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        gap: 10,
       }}>
-        {selectedId && (() => {
+        {selectedId ? (() => {
           const wp = WAYPOINTS.find(w => w.id === selectedId);
           return wp ? (
             <span style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: wp.color }}>
               {wp.emoji} {wp.name} · Day {wp.day}
             </span>
           ) : null;
-        })()}
-        {userCoords && (
-          <span style={{ display: "flex", alignItems: "center", gap: 5, fontFamily: "var(--font-sans)", fontSize: 11, color: "#1B72C0", fontWeight: 600, marginLeft: "auto" }}>
-            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#1B72C0"/></svg>
-            Your location
-          </span>
-        )}
-        {!selectedId && (
+        })() : (
           <span style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "#bbb" }}>
             {WAYPOINTS.length} stops · Jun 10–20
           </span>
         )}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <span style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "#bbb" }}>
+            Numbers = day
+          </span>
+          {userCoords && (
+            <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "var(--font-sans)", fontSize: 10, color: "#1B72C0", fontWeight: 600 }}>
+              <svg width="7" height="7"><circle cx="3.5" cy="3.5" r="3.5" fill="#1B72C0"/></svg>
+              You
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
